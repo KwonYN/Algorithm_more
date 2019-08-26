@@ -1,0 +1,2088 @@
+#pragma warning (disable: 4996)
+// 문제 A2: [TST]카드 건네기
+#if 0
+#include <stdio.h>
+#define CARD_MAX   (100)
+
+typedef struct _deck
+{
+	int num;
+	struct _deck * next;
+}DECK;
+DECK carddeck[CARD_MAX + 10];
+DECK Head;
+
+void Input(void);
+void Operation(void);
+void Card_Sort(int order);
+void Insert_Node(DECK * head, int no);
+void Print(void);
+
+int N;
+int Card[CARD_MAX + 10];
+int ptr_ground;
+int ptr_top;
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	Head.next = &carddeck[0];
+	for (i = 0; i < N; i++)
+	{
+		Card[i] = i + 1;
+		carddeck[i].next = &carddeck[i + 1];
+	}
+	ptr_ground = N - 1;
+}
+
+void Operation(void)
+{
+	int i;
+
+	for (i = 0; N > 0; i++)
+	{
+		ptr_ground += Card[ptr_ground] / 2;
+		if (ptr_ground >= N) ptr_ground %= N;
+		ptr_top = ptr_ground + 1;
+		if (ptr_top >= N)
+		{
+			ptr_top %= N;
+			ptr_ground--;
+		}
+		carddeck[i].num = Card[ptr_top];
+		Card_Sort(ptr_top);
+		N--;
+	}
+}
+
+// Card 정렬하는 것
+void Card_Sort(int order)
+{
+	int i, tmp;
+	tmp = Card[ptr_top];
+
+	for (i = order + 1; i < N; i++)
+	{
+		Card[i - 1] = Card[i];
+	}
+	Card[N - 1] = tmp;
+}
+
+// Insert_Node하는 것
+void Insert_Node(DECK * head, int no)
+{
+	DECK * nnode = (DECK *)0x0;
+
+	while (head->next)
+	{
+		head = head->next;
+	}
+
+	nnode->num = no;
+	nnode->next = head->next;
+	head->next = nnode;
+}
+
+void Print(void)
+{
+	DECK * head = &Head;
+
+	for (; head->next->num != 0; head = head->next)
+	{
+		printf("%d ", head->next->num);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+
+
+// 문제 A7: [TST]UNIQUENESS
+#if 0
+#include <stdio.h>
+#define MAX_STRING      (10000)
+
+typedef struct _str
+{
+	int num;
+	char voca[21];
+	struct _str * next;
+}HASH;
+HASH unique[MAX_STRING + 10];
+
+void Input(void);
+int Str_Comp(char * p, char * q);
+void Operation(void);
+void Print(void);
+
+int N;
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	HASH * Head = (HASH *)0x0;
+	int i, j;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%s", unique[i].voca);
+		unique[i].num = i;
+		for (j = i - 1; j >= 1; j--)
+		{
+			if (Str_Comp(unique[i].voca, unique[j].voca))
+			{
+				Head = &unique[j];
+				unique[i].next = Head->next;
+				Head->next = &unique[i];
+				break;
+			}
+		}
+	}
+}
+
+int Str_Comp(char * p, char * q)
+{
+	while (*p == *q)
+	{
+		if (*q == '\0') return 1;
+		p++;
+		q++;
+	}
+	return 0;
+}
+
+void Operation(void)
+{
+
+}
+
+void Print(void)
+{
+	HASH * Head = (HASH *)0x0;
+	int i, check = 0;
+
+	for (i = 1; i <= N; i++)
+	{
+		if (unique[i].next == (HASH *)0x0 || unique[i].num <= 0)
+		{
+			check++;
+			continue;
+		}
+		if (unique[i].num > 0) printf("%s ", unique[i].voca);
+		Head = &unique[i];
+		for (; Head; Head = Head->next)
+		{
+			//if(Head->num > 0)
+			//{
+			printf("%d ", Head->num);
+			Head->num = 0;
+			//}
+		}
+		printf("\n");
+	}
+	if (check == N) printf("unique\n");
+}
+#endif
+
+
+
+// 문제 A7: [TST]UNIQUENESS
+// => HASH 함수 사용해서 풀고, 이해 높이기!!
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+
+// 문제 A5: [TST] 에디터 => Runtime Error 떴음...
+#if 0
+#include <stdio.h>
+#define START           (100000)
+#define COMMAND_N       (500000)
+
+void Input(void);
+void Operation(void);
+void Get_Length(void);
+void Sub_Operation1(int order);
+void Sub_Operation2(int order);
+void Print(void);
+
+char munja10[START + COMMAND_N + 10];
+int len;
+int N;
+char com1[COMMAND_N + 10];
+char com2[COMMAND_N + 10];      // P의 경우에만 발동!
+int Wptr;
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	gets(munja10);
+	Get_Length();
+	scanf("%d", &N);
+	for (i = 0; i < N; i++)
+	{
+		scanf(" %c", &com1[i]);
+		if (com1[i] == 'P') scanf(" %c", &com2[i]);
+	}
+	Wptr = len;
+}
+
+void Operation(void)
+{
+	int i;
+	for (i = 0; i < N; i++)
+	{
+		switch (com1[i])
+		{
+		case 'L':
+			if (Wptr != 0) Wptr--;
+			break;
+		case 'D':
+			if (Wptr != len) Wptr++;
+			break;
+		case 'B':
+			if (Wptr != 0)
+			{
+				munja10[Wptr--] = '\0';
+				Sub_Operation1(Wptr + 1);
+			}
+			break;
+		default:        // 'P'알 때!!!
+			Sub_Operation2(Wptr);
+			munja10[Wptr++] = com2[i];
+			break;
+		}
+	}
+
+}
+
+void Sub_Operation1(int order)  // 삭제
+{
+	int i;
+
+	for (i = order; i < len - 1; i++)
+	{
+		munja10[i] = munja10[i + 1];
+	}
+	Get_Length();
+}
+
+void Sub_Operation2(int order)   // 추가
+{
+	int i;
+	for (i = order + 1; i <= len + 1; i++)
+	{
+		munja10[i] = munja10[i - 1];
+	}
+}
+
+void Get_Length(void)
+{
+	len = 0;
+	while (munja10[len]) len++;
+}
+
+void Print(void)
+{
+	//        int i;
+
+	printf("%s\n", munja10);
+	//        for(i = 0; i < N; i++)
+	//        {
+	//                printf("%c ", com1[i]);
+	//                if(com1[i] == 'P') printf("%c ", com2[i]);
+	//                printf("\n");
+	//        }
+}
+
+#endif
+
+
+
+
+
+// 문제 A5: [TST] 에디터	=> 다시 풀어야 함!
+#if 0
+#include <stdio.h>
+#define START           (100000)
+#define COMMAND_N       (500000)
+
+void Input(void);
+void Operation(void);
+void Get_Length(void);
+void Sub_Operation1(int order);
+void Sub_Operation2(int order);
+void Print(void);
+
+char munja10[START + COMMAND_N + 10];
+int len;
+int N;
+char com1[COMMAND_N + 10];
+char com2[COMMAND_N + 10];      // P의 경우에만 발동!
+int Wptr;
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+	len = 0;
+
+	gets(munja10);
+	while (munja10[len]) len++;
+	scanf("%d", &N);
+	for (i = 0; i < N; i++)
+	{
+		scanf(" %c", &com1[i]);
+		if (com1[i] == 'P') scanf(" %c", &com2[i]);
+	}
+	Wptr = len;
+}
+
+void Operation(void)
+{
+	int i;
+	char * p;
+	char * q;
+
+	for (i = 0; i < N; i++)
+	{
+		switch (com1[i])
+		{
+		case 'L':
+			if (Wptr != 0) Wptr--;
+			break;
+		case 'D':
+			if (Wptr != len) Wptr++;
+			break;
+		case 'B':
+			if (Wptr != 0)
+			{
+				munja10[--Wptr] = '\0';
+				//Wptr++;
+				//p = &munja10[Wptr];
+				//*p << 8;
+				Sub_Operation1(Wptr);
+				len--;
+			}
+			break;
+		default:        // 'P'알 때!!!
+			Sub_Operation2(Wptr);
+			//q = &munja10[Wptr];
+			//*q >> 8;
+			munja10[Wptr++] = com2[i];
+			len++;
+			break;
+		}
+	}
+
+}
+
+void Sub_Operation1(int order)  // 삭제
+{
+	int i;
+
+	for (i = order; i < len; i++)
+	{
+		munja10[i] = munja10[i + 1];
+	}
+	//Get_Length();
+}
+
+void Sub_Operation2(int order)   // 추가
+{
+	int i;
+	for (i = order + 1; i <= len; i++)
+	{
+		munja10[i] = munja10[i - 1];
+	}
+}
+
+void Print(void)
+{
+	printf("%s\n", munja10);
+}
+#endif
+
+
+// 다시하자 하하하핫;;
+// 문제 A5: [TST] 에디터 => Double Linked List로 풀어보자!!
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+typedef struct _edit
+{
+	char word;
+	struct _edit * next;
+}EDIT;
+EDIT editor[600010];
+
+char munja10[600010];
+int len;
+int N;
+int ptr;
+char com1[600010];
+char com2[600010];
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%s", munja10);
+	while (munja10[len]) len++;
+	editor[0].next = &(editor[1]);
+	for (i = 1; i <= len; i++)
+	{
+		editor[i].word = munja10[i];
+		editor[i].next = &(editor[i + 1]);
+	}
+	ptr = len + 1;
+	scanf("%d", &N);
+	for (i = 0; i < N; i++)
+	{
+		scanf(" %c", &com1[i]);
+		if (com1[i] == 'P') scanf(" %c", &com2[i]);
+	}
+}
+
+void Operation(void)
+{
+	int i;
+
+	for (i = 1; i <= len; i++)
+	{
+		switch (com1[i])
+		{
+		case 'L':
+			if (ptr != 1) ptr--;
+			break;
+		case 'D':
+			if (ptr != len + 1) ptr++;
+			break;
+		case 'B':
+			if (ptr != 1)
+			{
+				editor[ptr - 2].next = &editor[ptr - 1];
+			}
+			break;
+		default:
+			EDIT * addition = (EDIT *)0x0;
+			addition->word = com2[i];
+			addition->next = editor[ptr - 1].next;
+			editor[ptr - 1].next = addition;
+			break;
+		}
+	}
+
+}
+
+void Print(void)
+{
+	EDIT * Head = &editor[1];
+
+	while (Head)
+	{
+		printf("%c", Head->word);
+		Head = Head->next;
+	}
+}
+
+#endif
+
+
+
+
+// 문제 F5: [TST]숫자찾기
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int T;          // Test Case No.
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+
+// 문제 A0: [TST]악수
+// "인접"이란? : 서로 연결되어 있는 노드들의 관계가 인접 관계. 간선으로 "직접 연결"된 노드들.
+// ★알고리즘에서는 변수를 주의해야 함!!! => 전역/지역, 이름, ...
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+char Get_O(int cr, int cc);
+void Print(void);
+
+int R;
+int C;
+char Map[52][52];
+int cur_shake;
+int max;
+
+int main(void)
+{
+	//freopen("in_A0.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i, j;
+
+	scanf("%d %d", &R, &C);
+	//for (i = 1; i <= R; i++)
+	//{
+	//	for (j = 1; j <= C; j++)
+	//	{
+	//		scanf(" %c", &Map[i][j]);
+	//	}
+	//}
+	for (i = 0; i < R; i++)
+	{
+		scanf("%s", Map[i]);
+	}
+}
+
+char Get_O(int cr, int cc)
+{
+	int i;
+	int dr[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+	int dc[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+	int nr, nc;
+	int cnt = 0;
+
+	for (i = 0; i < 8; i++)
+	{
+		nr = cr + dr[i];
+		nc = cc + dc[i];
+		if (nr < 0 || nc < 0 || nr >= R || nc >= C) continue;
+		if (Map[nr][nc] == 'o') cnt++;
+	}
+
+	return cnt;
+}
+
+void Operation(void)
+{
+	int r, c, check;
+	max = 0;
+
+	for (r = 0; r < R; r++)
+	{
+		for (c = 0; c < C; c++)
+		{
+			if ( Map[r][c] == 'o' ) cur_shake += Get_O(r, c);
+			else 
+			{
+				check = Get_O(r, c);
+				if ( check > max ) max = check;
+			}
+			Map[r][c] = '.';
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", max);
+	printf("%d\n", cur_shake);
+}
+
+#endif
+
+// 
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+char Get_O(int cr, int cc);
+void Print(void);
+
+int R;
+int C;
+char Map[52][52];
+int cur_shake;
+int max;
+
+int main(void)
+{
+	//freopen("in_A0.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i, j;
+
+	scanf("%d %d", &R, &C);
+	for (i = 0; i < R; i++)
+	{
+		scanf("%s", Map[i]);
+	}
+}
+
+char Get_O(int cr, int cc)
+{
+	int i;
+	int dr[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+	int dc[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+	int nr, nc;
+	int cnt = 0;
+
+	for (i = 0; i < 8; i++)
+	{
+		nr = cr + dr[i];
+		nc = cc + dc[i];
+		if (nr < 0 || nc < 0 || nr >= R || nc >= C) continue;
+		if ( Map[nr][nc] == 'o' ) cnt++;
+	}
+
+	return cnt;
+}
+
+void Operation(void)
+{
+	int r, c, check;
+	max = 0;
+	cur_shake = 0;
+
+	for (r = 0; r < R; r++)
+	{
+		for (c = 0; c < C; c++)
+		{
+			if ( Map[r][c] == '.' )
+			{
+				check = Get_O(r, c);
+				printf("check = %d\n", check);
+				if (check > max) max = check;
+				printf("max = %d\n", max);
+			}
+		}
+		for (c = 0; c < C; c++)
+		{
+			if ( Map[r][c] == 'o' )
+			{
+				{
+					cur_shake += Get_O(r, c);
+					Map[r][c] = '.';
+				}
+			}
+		}
+	}
+}
+
+void Print(void)
+{
+	int i, j;
+	for (i = 0; i < R; i++)
+	{
+		for (j = 0; j < C; j++)
+		{
+			printf("%c", Map[i][j]);
+		}
+		printf("\n");
+	}
+
+	printf("%d\n", max);
+	printf("%d\n", cur_shake);
+}
+#endif
+
+
+// 문제 A0: [TST]악수
+// "인접"이란? : 서로 연결되어 있는 노드들의 관계가 인접 관계. 간선으로 "직접 연결"된 노드들.
+// ★알고리즘에서는 변수를 주의해야 함!!! => 전역/지역, 이름, ...
+
+// 원래 냈던 것
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+char Get_O(int cr, int cc);
+void Print(void);
+
+int R;
+int C;
+char Map[52][52];
+int cur_shake;
+int max;
+
+int main(void)
+{
+	//freopen("in_A0.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d %d", &R, &C);
+	for (i = 0; i < R; i++)
+	{
+		scanf("%s", Map[i]);	// 처음에 맵을 조금 더 넓게 잡고, 특히 int형으로 바꿔줄 수만 있다면
+	}							// 후에 if를 사용해서 판단할 경우의 수가 줄어들 수 있음!!!
+}
+
+char Get_O(int cr, int cc)
+{
+	int i;
+	int dr[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+	int dc[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+	int nr, nc;
+	int cnt = 0;
+
+	for (i = 0; i < 8; i++)
+	{
+		nr = cr + dr[i];
+		nc = cc + dc[i];
+		if (nr < 0 || nc < 0 || nr >= R || nc >= C) continue;
+		if (Map[nr][nc] == 'o') cnt++;
+	}
+
+	return cnt;
+}
+
+void Operation(void)
+{
+	int r, c, check;
+	max = 0;
+
+	for (r = 0; r < R; r++)
+	{
+		for (c = 0; c < C; c++)
+		{
+			if (Map[r][c] == '.')
+			{
+				check = Get_O(r, c);
+				if (check > max) max = check;
+			}
+			else
+			{
+				cur_shake += Get_O(r, c);
+			}
+		}
+	}
+}
+
+void Print(void)
+{	// 일단 전체 경우의 수, 그 중에서도 중복을 어떻게 처리해줄 것인지 찾는 것이 중요!!!
+	printf("%d\n", max + cur_shake / 2);
+}
+#endif
+
+/*
+// 은애님 ver.
+[배열 범위 외의 것들을 굳이 if를 사용해서 검사할 필요가 없게끔 가공!!]
+#include <stdio.h>
+
+void input(void);
+int operation(void);
+
+int a[52][52];
+int Y, X;
+
+int main(void)
+{
+	scanf("%d %d", &Y, &X);
+	input();
+	printf("%d\n", operation());
+
+	return 0;
+}
+
+void input(void)
+{
+	int i, j;
+	char t[52] = { 0 };
+
+	for (i = 1; i <= Y; i++)
+	{
+	scanf("%s", t + 1);
+
+		for (j = 1; j <= X; j++)
+		{
+			a[i][j] = (t[j] == 'o') ? 1 : 0;
+		}
+	}
+}
+
+int operation(void)
+{
+	int i, j;
+	int t;
+	int tot = 0, max = 0;
+
+	for (i = 1; i <= Y; i++)
+	{
+		for (j = 1; j <= X; j++)
+		{
+			t = a[i - 1][j - 1] + a[i - 1][j] + a[i - 1][j + 1]
+			+ a[i][j - 1] + a[i][j + 1]
+			+ a[i + 1][j - 1] + a[i + 1][j] + a[i + 1][j + 1];
+
+			if (!a[i][j])
+			{
+				if (t > max) max = t;
+			}
+			else tot += t;
+		}
+	}
+
+	return (tot / 2 + max);
+}
+
+*/
+
+
+
+// 문제 A1: [TEST] 쥐와고양이
+#if 0
+#include <stdio.h>
+#define ABS(x, y)	( ( ((x) - (y)) > 0 ) ? ((x) - (y)) : ((y) - (x)) )
+
+void Input(void);
+int Operation(void);
+void Print(void);
+
+int Map[17][17];
+int N;
+int Seed[8][2];
+int mouse_x;
+int mouse_y;
+int cat_x = 4;
+int cat_y = 4;
+int x[5] = { 0, 0, -1, 0, 1 };
+int y[5] = { 0, 1, 0, -1, 0 };
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d %d", &Seed[i][0], &Seed[i][1]);
+	}
+	mouse_x = Seed[1][0];
+	mouse_y = Seed[1][1];
+	Seed[i][0] = 0;
+	Seed[i][1] = 1;
+	scanf("%d %d", &cat_x, &cat_y);
+}
+
+int Operation(void)
+{
+	int i = 2;
+
+	// 밖으로 못 나가게 해야함!!
+	for ( ; ; )
+	{	// 앞이 목표물
+		if ( ABS(mouse_x, cat_x) == ABS(mouse_y, cat_y) )
+		{
+			cat_y += ;
+			cat_x += ;
+			if ()
+		}
+		else
+		{
+			// 쥐를 향해 가게끔!! && 1칸, 2칸 및 우선순위에 대한 조건도!!
+			cat_y += ;
+			cat_x += ;
+			if ()
+		}
+		// 범위 벗어난면 안돼!!
+		if (cat_x > 13 || cat_x < 1 || cat_y > 13 || cat_y < 1);
+
+		if (cat_x == mouse_x && cat_y == mouse_y) return 0;
+		else
+		{	// 씨앗으로 가게끔 해야 함!!
+			mouse_x += ;
+			mouse_y += ;
+
+			// 쥐굴에 도착하면 끝!!
+			if (mouse_x == 0 && mouse_y == 1) return 1;
+
+			// 범위 벗어난면 안돼!!
+			if (mouse_x > 13 || mouse_x < 1 || mouse_y > 13 || mouse_y < 1);
+
+			if ( mouse_x == Seed[i][0] && mouse_y == Seed[i][1] )	// 씨앗 만나면 그 다음으로!!
+			{
+				i++;
+			}
+		}
+	}
+	return 1;
+}
+
+void Print(void)
+{
+	printf("%d\n", Operation());
+}
+
+#endif
+
+
+
+
+// 문제 A2: [TST] 도약
+#if 0
+#include <stdio.h>
+#define MAX	(1010)
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int N;
+int x[MAX];
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	for (i = 0; i < N; i++)
+	{
+		scanf("%d", &x[i]);
+	}
+}
+
+void Operation(void)
+{
+	int i, j;
+
+	
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+/*
+바이러스 설계(FF_BFS)
+
+1. 입력 설계 : 입력 배열을 준비(인접 행렬, 인접 리스트 생성)
+= > 타입, 크기를 결정
+
+1) 인접 행렬 생성
+#define MAX (104)
+int a[MAX][MAX];
+scanf("%d %d", &s, &e);
+a[s][e] = a[e][s] = 1;
+
+2. 정점의 타입, 개수를 파악함
+int, 100개
+
+3. Queue 설계 : 정점을 대상으로 하므로 정점의 타입, 개수 만큼 준비
+InQueue, OutQueue 함수 및 wp, rp, struct st {};
+
+int Queue[MAX];
+int wp, rp;
+InQueue: Queue[wp++] = data;
+OutQueue: out = Queue[rp++];
+
+4. 시작 정점
+1번 컴퓨터
+
+5. 인접 정점
+for (i = 1; i <= N; i++)
+{
+	if (a[out][i] == 1 && visit[i] == 0) 인접_정점;
+}
+
+6. 도착 정점
+없음
+
+7. 방문 표시 설계(경험 기록) : 방문 표시 방법(0 / 1, 거리 / 횟수, 비용)
+별도의 visit 배열 사용
+int visit[MAX];  (0 / 1로 표기)
+*/
+
+// 문제 A3: [TST]바이러스	 => BFS 접근 방식!!
+#if 0
+#include <stdio.h>
+#define MAX_N	(100 + 5)
+
+void In_Queue(int data);
+int Out_Queue(void);
+void Input(void);
+int FF_BFS(int s);
+void Print(void);
+
+int N;					// 컴퓨터
+int Com[MAX_N][MAX_N];	// 인접행렬
+int Que[MAX_N];			// 큐 생성
+int Wp;
+int Rp;
+
+int main(void)
+{
+	//freopen("in_A3.txt", "r", stdin);
+	Input();
+	Print();
+
+	return 0;
+}
+
+void In_Queue(int data)
+{
+	Que[Wp++] = data;
+}
+
+int Out_Queue(void)
+{
+	return Que[Rp++];
+}
+
+void Input(void)
+{
+	int L;			// 네트워크/연결 
+	int s, e;
+	int i;
+
+	scanf("%d", &N);
+	scanf("%d", &L);
+	for (i = 0; i < L; i++)
+	{
+		scanf("%d %d", &s, &e);
+		Com[s][e] = Com[e][s] = 1;
+	}
+}
+
+// ★이 함수가 이해하기!!★
+int FF_BFS(int s)
+{
+	int i;		// 반복 변수 하나 꼭 필요!!!
+	int out;	// 체크용
+	int Visit[MAX_N] = { 0 };
+	Wp = Rp = 0;
+	
+	In_Queue(s);
+	Visit[s] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		printf("OUT = %d\n", out);
+		for (i = 1; i <= N; i++)
+		{
+			if (Com[out][i] == 1 && Visit[i] == 0)
+			{
+				In_Queue(i);
+				Visit[i] = 1;
+//				Visit[i] = Visit[out] + 1;	=>	시간, 횟수 표시할 때는 요롷게..!!
+			}
+		}
+	}
+
+	return Wp - 1;	// 처음에 1번 컴퓨터가 바이러스 걸린 것이니까 전체 바이러스 컴 중 하나를 빼주어야 함!
+}
+
+
+void Print(void)
+{	// 시작 정점에서부터!!
+	printf("%d\n", FF_BFS(1));
+}
+#endif
+
+
+
+
+// 문제 A3: [TST]바이러스	 => DFS 접근 방식!!
+#if 0
+#include <stdio.h>
+#define MAX_COM	(100 + 5)
+
+void FF_DFS(int d, int num);
+void Input(void);
+void Print(void);
+
+int N;			// 컴퓨터 수
+int L;			// 연결 수
+int s, e;
+int Com[MAX_COM][MAX_COM];	// 인접 배열
+int Visit[MAX_COM];			// 방문 표시를 위한 배열
+int cnt;
+
+int main(void)
+{
+	freopen("in_A3.txt", "r", stdin);
+	Input();
+	FF_DFS(1, 1);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	scanf("%d", &L);
+	for (i = 0; i < L; i++)
+	{
+		scanf("%d %d", &s, &e);
+		Com[s][e] = Com[e][s] = 1;
+	}
+}
+
+void FF_DFS(int d, int num)
+{
+	int i;
+
+	printf("FF_DFS(int d = %d, int num = %d);\n", d, num);
+	Visit[num] = 1;
+	cnt++;
+
+	for (i = 1; i <= N; i++)
+	{
+		if (Com[num][i] == 1 && Visit[i] == 0)
+		{
+			FF_DFS(d + 1, i);
+			//cnt++;
+		}
+	}
+}
+
+void Print(void)
+{	
+	printf("%d\n", cnt - 1);
+	// 또는 위에서 FF_DFS(d + 1, i); 밑에 cnt++;을 해주면 됨!! 
+	// ★왜? => 첫 노드, 즉 시작노드를 포함하지 않기 때문!!
+}
+#endif
+
+
+
+
+
+// 철도 잇기	[★시작 정점이 여러 개일 수 있을 때 어떻게 처리해줄까?에 대한 아이디어!★]
+/*
+철도 잇기 설계(FF_BFS)
+
+1. 입력 설계 : 입력 배열을 준비(인접 행렬, 인접 리스트 생성)
+= > 타입, 크기를 결정
+
+1) 인접 행렬 생성
+	#define MAX (54)
+	int a[MAX][MAX];
+	scanf("%d %d", &s, &e);
+	a[s][e] = a[e][s] = 1;
+
+2. 정점의 타입, 개수를 파악함
+	int, 50개
+
+3. Queue 설계 : 정점을 대상으로 하므로 정점의 타입, 개수 만큼 준비
+	InQueue, OutQueue 함수 및 wp, rp, struct st {};
+
+	int Queue[MAX];
+	int wp, rp;
+	InQueue: Queue[wp++] = data;
+	OutQueue: out = Queue[rp++];
+
+4. 시작 정점
+	for (i = 1; i <= N; i++)
+	{
+		if (visit[i] == 0) G[gCnt++] = FF_BFS(i);
+	}
+
+5. 인접 정점
+	for (i = 1; i <= N; i++)
+	{
+		if (a[out][i] == 1 && visit[i] == 0) 인접_정점;
+	}
+
+6. 도착 정점
+	없음
+
+7. 방문 표시 설계(경험 기록) : 방문 표시 방법(0 / 1, 거리 / 횟수, 비용)
+	별도의 visit 배열 사용
+	int visit[MAX];  (0 / 1로 표기)
+
+8. 그룹 중 큰 것을 찾아 K+1개의 합을 구한다
+	
+	simpleSort(K+1);
+	getSum(K+1);
+
+
+	void simpleSort(int num)
+	{
+		int i, j;
+
+		for(i=0; i<num; i++)  // num개 만큼
+		{
+			for(j=i+1; j<gCnt; j++)  // 정렬 범위
+			{
+				if (G[i] < G[j])
+				{
+					int temp = G[i]; G[i] = G[j]; G[j] = temp;
+				}
+			}
+		}
+	}
+
+	int getSum(int num)
+	{
+		int i;
+		int sum = 0;
+		for(i=0; i<num; i++)
+		{
+			sum += G[i];
+		}
+
+		return sum;
+	}
+*/
+
+// 문제 A4: [TEST] 철도잇기	=> BFS
+#if 0
+#include <stdio.h>
+#define MAX_CT	(55)
+
+void In_Que(int data);
+int Out_Que(void);
+void Input(void);
+int Operation(void);
+int Find_Link(int s, int * v);
+int Simple_Sort_and_Get_Max(int no, int no2, int * g);
+void Print(void);
+
+int N;			// 철도역 수(정점, 노드)
+int M;			// 철도 수(간선, 링크)
+int K;			// 추가 철도 수
+int City[MAX_CT][MAX_CT];		// 인접 행렬
+int Que[MAX_CT];		//큐
+int Wp;
+int Rp;
+int max;
+
+int main(void)
+{
+	freopen("in_A4.txt", "r", stdin);
+	Input();
+	Print();
+
+	return 0;
+}
+
+// 큐에 데이터 집어넣음
+void In_Que(int data)
+{
+	Que[Wp++] = data;
+}
+
+// 큐에서 데이터 빼냄
+int Out_Que(void)
+{
+	return Que[Rp++];
+}
+
+// 철도 역, 연결 간선 수, 추가 연결 가능 간선 수 입력!
+void Input(void)
+{
+	int i;
+	int s, e;
+
+	scanf("%d %d %d", &N, &M, &K);
+	for (i = 0; i < M; i++)
+	{
+		scanf("%d %d", &s, &e);
+		City[s][e] = City[e][s] = 1;
+	}
+}
+
+// 시작정점이 여러 곳일 수 있으니, 1에서부터 방문된 곳은 시작 정점으로 주지 않고,
+// 방문하지 않은 철도역에 대해서 시작정점으로 다시 주어 그룹을 구하는 함수
+// 그 그룹은 후에 Group배열의 각 요소로 저장이 될 예정
+int Find_Link(int s, int * v)
+{
+	int out;
+	int i;
+	Wp = Rp = 0;
+
+	In_Que(s);
+	v[s] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Que();
+		for (i = 1; i <= N; i++)
+		{
+			if (City[out][i] == 1 && v[i] == 0)
+			{
+				In_Que(i);
+				v[i] = 1;
+			}
+		}
+	}
+	return Wp;	// 한 그룹에 몇 개의 도시가 연결되어 있냐를 리턴해주는 것!!
+}
+
+// 각 그룹의 개수를 내림차순으로 정렬하여 연결했을 때의 철도역 최대 수를 구하는 함수
+int Simple_Sort_and_Get_Max(int no, int no2, int * g)
+{
+	int i, j;
+	int tmp;
+	int sum;
+
+	for (i = 0; i < no; i++)			// K개의 Link가 있으므로 정렬은 그것 + 1개 만큼 더!
+	{
+		for (j = i + 1; j < no2; j++)
+		{
+			if (g[i] < g[j])
+			{
+				tmp = g[j];
+				g[j] = g[i];
+				g[i] = tmp;
+			}
+		}
+	}
+
+	sum = g[0];
+	for (i = 1; i <= K && g[i]; i++)
+	{
+		sum += g[i];
+	}
+
+	return sum;
+}
+
+// Operation 함수 속에서 그룹 나누고, 그룹의 수 및 철도역 수 구하고, 마지막으로 최대값도 구함
+int Operation(void)
+{
+	int Visit[MAX_CT] = { 0 };
+	int Group[MAX_CT] = { 0 };
+	int i, j;
+	int group_cnt = 0;
+	int tmp;
+
+	for (i = 1; i <= N; i++)
+	{
+		if (Visit[i] == 0) Group[group_cnt++] = Find_Link(i, Visit);
+		//printf("Group[%d] = %d\n", group_cnt - 1, Group[group_cnt - 1]);
+	}
+
+	max = Simple_Sort_and_Get_Max(K + 1, group_cnt, Group);
+	return max;
+}
+
+// 최대 철도역 수 프린트
+void Print(void)
+{
+	printf("%d\n", Operation());
+}
+#endif
+
+
+// 문제 A4: [TEST] 철도잇기	=> DFS
+#if 0
+#include <stdio.h>
+#define MAX_CT	(50 + 5)
+
+void Input(void);
+void FF_DFS(int d, int num);
+void Sort_Get_Max(int k);
+void Print(void);
+
+int N;
+int M;
+int K;
+int City[MAX_CT][MAX_CT];
+int Visit[MAX_CT];
+int Group[MAX_CT];
+int cnt;
+int group_cnt;
+int max;
+
+int main(void)
+{
+	int i;
+
+	freopen("in_A4.txt", "r", stdin);
+	Input();
+	for (i = 1; i <= N; i++)
+	{
+		if (Visit[i] != 0) continue;
+		cnt = 0;
+		FF_DFS(1, i);
+		Group[group_cnt++] = cnt;
+		printf("cnt = %d, group_cnt = %d\n", cnt, group_cnt);
+	}
+	Sort_Get_Max(K);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+	int s, e;
+
+	scanf("%d %d %d", &N, &M, &K);
+	for (i = 0; i < M; i++)
+	{
+		scanf("%d %d", &s, &e);
+		City[s][e] = City[e][s] = 1;
+	}
+}
+
+void FF_DFS(int d, int num)
+{
+	int i, sub_cnt = 1;
+
+	Visit[num] = 1;
+	cnt++;
+	printf("FF_DFS(int d = %d, int num = %d);\n", d, num);
+
+	for (i = 1; i <= N; i++)
+	{
+		if ( City[num][i] == 1 && Visit[i] == 0 )
+		{
+			FF_DFS(d + 1, i);
+		}
+
+	}
+}
+
+void Sort_Get_Max(int k)
+{
+	int i, j;
+	int tmp;
+
+	for (i = 0; i <= k; i++)
+	{
+		for (j = i + 1; j < group_cnt; j++)
+		{
+			if ( Group[i] < Group[j] )
+			{
+				tmp = Group[j];
+				Group[j] = Group[i];
+				Group[i] = tmp;
+			}
+		}
+	}
+
+	max = Group[0];
+	for (i = 1; i <= k; i++)
+	{
+		if( Group[i] ) max += Group[i];
+	}
+}
+
+// 최대 철도역 수 프린트
+void Print(void)
+{
+	printf("%d\n", max);
+}
+#endif
+
+
+
+
+
+// 문제 A5: [TST] 둘레(Bronze)	=> 일단 BFS로 풀어보기!
+// 근데 DFS로 푼다면... 100*100 = 10000 번 호출할 수도? => Stack Overflow
+// 그럼 DFS로는 못 푸나..? => 다른 접근 필요! => if문을 써서 좌상단, 우하단의 좌표를 구하고, 돌 수 있도록 함!
+
+/*
+	1) 정점 찾아보기 : 건초 -> type 2개 (x, y좌표), 10000개
+		=> typedef struct st { int x; int y; }NODE;
+	2) 간선 : 상하좌우!
+	3) 입력 설계 : 정점이 어디에 있는지 표시할 Map 필요!
+		=> Map[MAX][MAX];  // MAX = 100;
+	4) 큐 설계 : 정점 타입으로, 개수는 정점 개수.
+		=> QUE[MAX * MAX];
+		   int Wp, Rp;
+		   void In_Que(int data)
+		   {
+				Que[Wp].y = y;
+				Que[Wp++].x = x;
+		   }
+		   
+		   void Out_Que(void)
+		   {
+				return Queue[Rp++];
+		   }
+
+	5) 시작 정점 : (NODE) {0, 0};		or		(NODE) {minY - 1, minX - 1};
+
+	6) 인접 정점 : 상하좌우!
+		=> int dy[] = {-1, 1, 0, 0};
+		   int dx[] = {0, 0, -1, 1};
+		   for(i = 0; i < 4; i++)
+		   {
+				ny = out.y + dy[i];
+				nx = out.x + dx[i];
+				if(ny < 0 || nx < 0 || ny > 101 || nx > 101) continue;	// or 다른 숫자로 써둬서 1인지 아닌지만 찾도록 하는 방법도!
+				if(Map[ny][nx] == 1) Cir++;
+				else
+				{
+					In_Que(ny, nx);
+					Visit[ny][nx] = 1;
+				}
+		   }
+	7) 방문표시! (위에 있음!) : Visit[MAX][MAX];
+*/
+
+// 문제 A5: [TST] 둘레(Bronze)
+#if 0
+#include <stdio.h>
+#define MAX_F	(102)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}QUE;
+QUE queue[MAX_F * MAX_F];
+
+void Input(void);
+void In_Queue(int data_y, int data_x);
+QUE * Out_Queue(void);
+int FF_BFS(int sy, int sx);
+void Print(void);
+
+int N;		// 건초더미 수 : 1 ~ 10000
+int yy, xx;
+int Cir;
+int Field[MAX_F][MAX_F];
+int Wp;
+int Rp;
+
+int main(void)
+{
+	freopen("in_A5.txt", "r", stdin);
+	Input();
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d %d", &xx, &yy);
+		Field[yy][xx] = 1;
+	}
+}
+
+void In_Queue(int data_y, int data_x)
+{
+	queue[Wp].y = data_y;
+	queue[Wp++].x = data_x;
+}
+
+QUE * Out_Queue(void)
+{
+	return &(queue[Rp++]);
+}
+
+int FF_BFS(int sy, int sx)
+{
+	int i;
+	QUE * out;
+	int Visit[MAX_F][MAX_F] = { { 0, 0 }, };
+	int dy[4] = {-1, 0, 1, 0};
+	int dx[4] = {0, 1, 0, -1};
+	int ny, nx;
+	Wp = 0;
+	Rp = 0;
+
+	In_Queue(sy, sx);
+	Visit[sy][sx] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (ny < 0 || nx < 0 || ny > 101 || nx > 101) continue;
+			if (Field[ny][nx] == 1)	Cir++;
+			if (Field[ny][nx] == 0 && Visit[ny][nx] == 0)
+			{
+				In_Queue(ny, nx);
+				Visit[ny][nx] = 1;
+			}
+		}
+	}
+
+	return Cir;
+}
+
+void Print(void)
+{
+	printf("%d\n", FF_BFS(0, 0));
+}
+
+#endif
+
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+#endif
