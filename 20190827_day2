@@ -1,0 +1,2734 @@
+#pragma warning (disable: 4996)
+
+// 문제 A0: [TST]악수
+// "인접"이란? : 서로 연결되어 있는 노드들의 관계가 인접 관계. 간선으로 "직접 연결"된 노드들.
+// ★알고리즘에서는 변수를 주의해야 함!!! => 전역/지역, 이름, ...
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+char Get_O(int cr, int cc);
+void Print(void);
+
+int R;
+int C;
+char Map[52][52];
+int cur_shake;
+int max;
+
+int main(void)
+{
+	//freopen("in_A0.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i, j;
+
+	scanf("%d %d", &R, &C);
+	//for (i = 1; i <= R; i++)
+	//{
+	//	for (j = 1; j <= C; j++)
+	//	{
+	//		scanf(" %c", &Map[i][j]);
+	//	}
+	//}
+	for (i = 0; i < R; i++)
+	{
+		scanf("%s", Map[i]);
+	}
+}
+
+char Get_O(int cr, int cc)
+{
+	int i;
+	int dr[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+	int dc[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+	int nr, nc;
+	int cnt = 0;
+
+	for (i = 0; i < 8; i++)
+	{
+		nr = cr + dr[i];
+		nc = cc + dc[i];
+		if (nr < 0 || nc < 0 || nr >= R || nc >= C) continue;
+		if (Map[nr][nc] == 'o') cnt++;
+	}
+
+	return cnt;
+}
+
+void Operation(void)
+{
+	int r, c, check;
+	max = 0;
+
+	for (r = 0; r < R; r++)
+	{
+		for (c = 0; c < C; c++)
+		{
+			if ( Map[r][c] == 'o' ) cur_shake += Get_O(r, c);
+			else 
+			{
+				check = Get_O(r, c);
+				if ( check > max ) max = check;
+			}
+			Map[r][c] = '.';
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", max);
+	printf("%d\n", cur_shake);
+}
+
+#endif
+
+// 
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+char Get_O(int cr, int cc);
+void Print(void);
+
+int R;
+int C;
+char Map[52][52];
+int cur_shake;
+int max;
+
+int main(void)
+{
+	//freopen("in_A0.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i, j;
+
+	scanf("%d %d", &R, &C);
+	for (i = 0; i < R; i++)
+	{
+		scanf("%s", Map[i]);
+	}
+}
+
+char Get_O(int cr, int cc)
+{
+	int i;
+	int dr[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+	int dc[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+	int nr, nc;
+	int cnt = 0;
+
+	for (i = 0; i < 8; i++)
+	{
+		nr = cr + dr[i];
+		nc = cc + dc[i];
+		if (nr < 0 || nc < 0 || nr >= R || nc >= C) continue;
+		if ( Map[nr][nc] == 'o' ) cnt++;
+	}
+
+	return cnt;
+}
+
+void Operation(void)
+{
+	int r, c, check;
+	max = 0;
+	cur_shake = 0;
+
+	for (r = 0; r < R; r++)
+	{
+		for (c = 0; c < C; c++)
+		{
+			if ( Map[r][c] == '.' )
+			{
+				check = Get_O(r, c);
+				printf("check = %d\n", check);
+				if (check > max) max = check;
+				printf("max = %d\n", max);
+			}
+		}
+		for (c = 0; c < C; c++)
+		{
+			if ( Map[r][c] == 'o' )
+			{
+				{
+					cur_shake += Get_O(r, c);
+					Map[r][c] = '.';
+				}
+			}
+		}
+	}
+}
+
+void Print(void)
+{
+	int i, j;
+	for (i = 0; i < R; i++)
+	{
+		for (j = 0; j < C; j++)
+		{
+			printf("%c", Map[i][j]);
+		}
+		printf("\n");
+	}
+
+	printf("%d\n", max);
+	printf("%d\n", cur_shake);
+}
+#endif
+
+
+// 문제 A0: [TST]악수
+// "인접"이란? : 서로 연결되어 있는 노드들의 관계가 인접 관계. 간선으로 "직접 연결"된 노드들.
+// ★알고리즘에서는 변수를 주의해야 함!!! => 전역/지역, 이름, ...
+
+// 원래 냈던 것
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+char Get_O(int cr, int cc);
+void Print(void);
+
+int R;
+int C;
+char Map[52][52];
+int cur_shake;
+int max;
+
+int main(void)
+{
+	//freopen("in_A0.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d %d", &R, &C);
+	for (i = 0; i < R; i++)
+	{
+		scanf("%s", Map[i]);	// 처음에 맵을 조금 더 넓게 잡고, 특히 int형으로 바꿔줄 수만 있다면
+	}							// 후에 if를 사용해서 판단할 경우의 수가 줄어들 수 있음!!!
+}
+
+char Get_O(int cr, int cc)
+{
+	int i;
+	int dr[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+	int dc[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+	int nr, nc;
+	int cnt = 0;
+
+	for (i = 0; i < 8; i++)
+	{
+		nr = cr + dr[i];
+		nc = cc + dc[i];
+		if (nr < 0 || nc < 0 || nr >= R || nc >= C) continue;
+		if (Map[nr][nc] == 'o') cnt++;
+	}
+
+	return cnt;
+}
+
+void Operation(void)
+{
+	int r, c, check;
+	max = 0;
+
+	for (r = 0; r < R; r++)
+	{
+		for (c = 0; c < C; c++)
+		{
+			if (Map[r][c] == '.')
+			{
+				check = Get_O(r, c);
+				if (check > max) max = check;
+			}
+			else
+			{
+				cur_shake += Get_O(r, c);
+			}
+		}
+	}
+}
+
+void Print(void)
+{	// 일단 전체 경우의 수, 그 중에서도 중복을 어떻게 처리해줄 것인지 찾는 것이 중요!!!
+	printf("%d\n", max + cur_shake / 2);
+}
+#endif
+
+/*
+// 은애님 ver.
+[배열 범위 외의 것들을 굳이 if를 사용해서 검사할 필요가 없게끔 가공!!]
+#include <stdio.h>
+
+void input(void);
+int operation(void);
+
+int a[52][52];
+int Y, X;
+
+int main(void)
+{
+	scanf("%d %d", &Y, &X);
+	input();
+	printf("%d\n", operation());
+
+	return 0;
+}
+
+void input(void)
+{
+	int i, j;
+	char t[52] = { 0 };
+
+	for (i = 1; i <= Y; i++)
+	{
+	scanf("%s", t + 1);
+
+		for (j = 1; j <= X; j++)
+		{
+			a[i][j] = (t[j] == 'o') ? 1 : 0;
+		}
+	}
+}
+
+int operation(void)
+{
+	int i, j;
+	int t;
+	int tot = 0, max = 0;
+
+	for (i = 1; i <= Y; i++)
+	{
+		for (j = 1; j <= X; j++)
+		{
+			t = a[i - 1][j - 1] + a[i - 1][j] + a[i - 1][j + 1]
+			+ a[i][j - 1] + a[i][j + 1]
+			+ a[i + 1][j - 1] + a[i + 1][j] + a[i + 1][j + 1];
+
+			if (!a[i][j])
+			{
+				if (t > max) max = t;
+			}
+			else tot += t;
+		}
+	}
+
+	return (tot / 2 + max);
+}
+
+*/
+
+
+
+// 문제 A1: [TEST] 쥐와고양이
+#if 0
+#include <stdio.h>
+#define ABS(x, y)	( ( ((x) - (y)) > 0 ) ? ((x) - (y)) : ((y) - (x)) )
+
+void Input(void);
+int Operation(void);
+void Print(void);
+
+int Map[17][17];
+int N;
+int Seed[8][2];
+int mouse_x;
+int mouse_y;
+int cat_x = 4;
+int cat_y = 4;
+int x[5] = { 0, 0, -1, 0, 1 };
+int y[5] = { 0, 1, 0, -1, 0 };
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d %d", &Seed[i][0], &Seed[i][1]);
+	}
+	mouse_x = Seed[1][0];
+	mouse_y = Seed[1][1];
+	Seed[i][0] = 0;
+	Seed[i][1] = 1;
+	scanf("%d %d", &cat_x, &cat_y);
+}
+
+int Operation(void)
+{
+	int i = 2;
+
+	// 밖으로 못 나가게 해야함!!
+	for ( ; ; )
+	{	// 앞이 목표물
+		if ( ABS(mouse_x, cat_x) == ABS(mouse_y, cat_y) )
+		{
+			cat_y += ;
+			cat_x += ;
+			if ()
+		}
+		else
+		{
+			// 쥐를 향해 가게끔!! && 1칸, 2칸 및 우선순위에 대한 조건도!!
+			cat_y += ;
+			cat_x += ;
+			if ()
+		}
+		// 범위 벗어난면 안돼!!
+		if (cat_x > 13 || cat_x < 1 || cat_y > 13 || cat_y < 1);
+
+		if (cat_x == mouse_x && cat_y == mouse_y) return 0;
+		else
+		{	// 씨앗으로 가게끔 해야 함!!
+			mouse_x += ;
+			mouse_y += ;
+
+			// 쥐굴에 도착하면 끝!!
+			if (mouse_x == 0 && mouse_y == 1) return 1;
+
+			// 범위 벗어난면 안돼!!
+			if (mouse_x > 13 || mouse_x < 1 || mouse_y > 13 || mouse_y < 1);
+
+			if ( mouse_x == Seed[i][0] && mouse_y == Seed[i][1] )	// 씨앗 만나면 그 다음으로!!
+			{
+				i++;
+			}
+		}
+	}
+	return 1;
+}
+
+void Print(void)
+{
+	printf("%d\n", Operation());
+}
+
+#endif
+
+
+
+
+// 문제 A2: [TST] 도약
+#if 0
+#include <stdio.h>
+#define MAX	(1010)
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int N;
+int x[MAX];
+int cnt;
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i, j;
+	int tmp;
+
+	scanf("%d", &N);
+	for (i = 0; i < N; i++)
+	{
+		scanf("%d", &x[i]);
+	}
+
+	for(i = 0; i < N - 1; i++)
+	{
+		for(j = i + 1; j < N; j++)
+		{
+			if(x[i] > x[j])
+			{
+				tmp = x[j];
+				x[j] = x[i];
+				x[i] = tmp;
+			}
+		}
+	}
+}
+
+void Operation(void)
+{
+	int i, j, k;
+	int jmp1, jmp2;
+
+	for (i = 0; i < N - 2; i++)
+	{
+		for (j = i + 1; j < N - 1; j++)
+		{
+			jmp1 = x[j] - x[i];
+			for (k = j + 1; k < N; k++)
+			{
+				jmp2 = x[k] - x[j];
+				if (jmp1 > jmp2) continue;
+				else if (jmp2 > 2 * jmp1) break;
+				else cnt++;
+			}
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", cnt);
+}
+
+#endif
+
+// 다른 버전
+// 문제 A2: [TST] 도약
+#if 0
+#include <stdio.h>
+#define MAX	(1010)
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int N;
+int x[MAX];
+int result;
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i, j;
+	int tmp;
+
+	scanf("%d", &N);
+	for (i = 0; i < N; i++)
+	{
+		scanf("%d", &x[i]);
+	}
+	// 버블소트 => 오름차순
+	for (i = 0; i < N - 1; i++)
+	{
+		for (j = 0; j < N - 1 - i; j++)
+		{
+			if (x[j] > x[j + 1])
+			{
+				tmp = x[j + 1];
+				x[j + 1] = x[j];
+				x[j] = tmp;
+			}
+		}
+	}
+}
+
+int Cnt_Result(int s, int e, int X)
+{
+	int m, cnt = 0;
+
+	while (s <= e)
+	{
+		m = (s + e) / 2;
+		if (x[m] < X)
+		{
+			s = m + 1;
+			cnt = s;
+		}
+		else
+		{
+			e = m - 1;
+		}
+	}
+	return cnt;
+}
+
+void Operation(void)
+{
+	int i, j, k;
+	int jmp, check1, check2;
+	int n = N - 1;
+
+	for (i = 0; i < N - 2; i++)
+	{
+		for (j = i + 1; j < N - 1; j++)
+		{
+			jmp = x[j] - x[i];
+			check1 = x[j] + 2 * jmp + 1;
+			check2 = x[j] + jmp;
+			result += Cnt_Result(1, n, check1) - Cnt_Result(1, n, check2);
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", result);
+}
+
+#endif
+
+
+
+
+
+
+/*
+바이러스 설계(FF_BFS)
+
+1. 입력 설계 : 입력 배열을 준비(인접 행렬, 인접 리스트 생성)
+= > 타입, 크기를 결정
+
+1) 인접 행렬 생성
+#define MAX (104)
+int a[MAX][MAX];
+scanf("%d %d", &s, &e);
+a[s][e] = a[e][s] = 1;
+
+2. 정점의 타입, 개수를 파악함
+int, 100개
+
+3. Queue 설계 : 정점을 대상으로 하므로 정점의 타입, 개수 만큼 준비
+InQueue, OutQueue 함수 및 wp, rp, struct st {};
+
+int Queue[MAX];
+int wp, rp;
+InQueue: Queue[wp++] = data;
+OutQueue: out = Queue[rp++];
+
+4. 시작 정점
+1번 컴퓨터
+
+5. 인접 정점
+for (i = 1; i <= N; i++)
+{
+	if (a[out][i] == 1 && visit[i] == 0) 인접_정점;
+}
+
+6. 도착 정점
+없음
+
+7. 방문 표시 설계(경험 기록) : 방문 표시 방법(0 / 1, 거리 / 횟수, 비용)
+별도의 visit 배열 사용
+int visit[MAX];  (0 / 1로 표기)
+*/
+
+// 문제 A3: [TST]바이러스	 => BFS 접근 방식!!
+#if 0
+#include <stdio.h>
+#define MAX_N	(100 + 5)
+
+void In_Queue(int data);
+int Out_Queue(void);
+void Input(void);
+int FF_BFS(int s);
+void Print(void);
+
+int N;					// 컴퓨터
+int Com[MAX_N][MAX_N];	// 인접행렬
+int Que[MAX_N];			// 큐 생성
+int Wp;
+int Rp;
+
+int main(void)
+{
+	//freopen("in_A3.txt", "r", stdin);
+	Input();
+	Print();
+
+	return 0;
+}
+
+void In_Queue(int data)
+{
+	Que[Wp++] = data;
+}
+
+int Out_Queue(void)
+{
+	return Que[Rp++];
+}
+
+void Input(void)
+{
+	int L;			// 네트워크/연결 
+	int s, e;
+	int i;
+
+	scanf("%d", &N);
+	scanf("%d", &L);
+	for (i = 0; i < L; i++)
+	{
+		scanf("%d %d", &s, &e);
+		Com[s][e] = Com[e][s] = 1;
+	}
+}
+
+// ★이 함수 이해하기!!★
+int FF_BFS(int s)
+{
+	int i;		// 반복 변수 하나 꼭 필요!!!
+	int out;	// 체크용
+	int Visit[MAX_N] = { 0 };
+	Wp = Rp = 0;
+	
+	In_Queue(s);
+	Visit[s] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		printf("OUT = %d\n", out);
+		for (i = 1; i <= N; i++)
+		{
+			if (Com[out][i] == 1 && Visit[i] == 0)
+			{
+				In_Queue(i);
+				Visit[i] = 1;
+//				Visit[i] = Visit[out] + 1;	=>	시간, 횟수 표시할 때는 요롷게..!!
+			}
+		}
+	}
+
+	return Wp - 1;	// 처음에 1번 컴퓨터가 바이러스 걸린 것이니까 전체 바이러스 컴 중 하나를 빼주어야 함!
+}
+
+
+void Print(void)
+{	// 시작 정점에서부터!!
+	printf("%d\n", FF_BFS(1));
+}
+#endif
+
+
+
+
+// 문제 A3: [TST]바이러스	 => DFS 접근 방식!!
+#if 0
+#include <stdio.h>
+#define MAX_COM	(100 + 5)
+
+void FF_DFS(int d, int num);
+void Input(void);
+void Print(void);
+
+int N;			// 컴퓨터 수
+int L;			// 연결 수
+int s, e;
+int Com[MAX_COM][MAX_COM];	// 인접 배열
+int Visit[MAX_COM];			// 방문 표시를 위한 배열
+int cnt;
+
+int main(void)
+{
+	freopen("in_A3.txt", "r", stdin);
+	Input();
+	FF_DFS(1, 1);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	scanf("%d", &L);
+	for (i = 0; i < L; i++)
+	{
+		scanf("%d %d", &s, &e);
+		Com[s][e] = Com[e][s] = 1;
+	}
+}
+
+void FF_DFS(int d, int num)
+{
+	int i;
+
+	printf("FF_DFS(int d = %d, int num = %d);\n", d, num);
+	Visit[num] = 1;
+	cnt++;
+
+	for (i = 1; i <= N; i++)
+	{
+		if (Com[num][i] == 1 && Visit[i] == 0)
+		{
+			FF_DFS(d + 1, i);
+			//cnt++;
+		}
+	}
+}
+
+void Print(void)
+{	
+	printf("%d\n", cnt - 1);
+	// 또는 위에서 FF_DFS(d + 1, i); 밑에 cnt++;을 해주면 됨!! 
+	// ★왜? => 첫 노드, 즉 시작노드를 포함하지 않기 때문!!
+}
+#endif
+
+
+
+
+
+// 철도 잇기	[★시작 정점이 여러 개일 수 있을 때 어떻게 처리해줄까?에 대한 아이디어!★]
+/*
+철도 잇기 설계(FF_BFS)
+
+1. 입력 설계 : 입력 배열을 준비(인접 행렬, 인접 리스트 생성)
+= > 타입, 크기를 결정
+
+1) 인접 행렬 생성
+	#define MAX (54)
+	int a[MAX][MAX];
+	scanf("%d %d", &s, &e);
+	a[s][e] = a[e][s] = 1;
+
+2. 정점의 타입, 개수를 파악함
+	int, 50개
+
+3. Queue 설계 : 정점을 대상으로 하므로 정점의 타입, 개수 만큼 준비
+	InQueue, OutQueue 함수 및 wp, rp, struct st {};
+
+	int Queue[MAX];
+	int wp, rp;
+	InQueue: Queue[wp++] = data;
+	OutQueue: out = Queue[rp++];
+
+4. 시작 정점
+	for (i = 1; i <= N; i++)
+	{
+		if (visit[i] == 0) G[gCnt++] = FF_BFS(i);
+	}
+
+5. 인접 정점
+	for (i = 1; i <= N; i++)
+	{
+		if (a[out][i] == 1 && visit[i] == 0) 인접_정점;
+	}
+
+6. 도착 정점
+	없음
+
+7. 방문 표시 설계(경험 기록) : 방문 표시 방법(0 / 1, 거리 / 횟수, 비용)
+	별도의 visit 배열 사용
+	int visit[MAX];  (0 / 1로 표기)
+
+8. 그룹 중 큰 것을 찾아 K+1개의 합을 구한다
+	
+	simpleSort(K+1);
+	getSum(K+1);
+
+
+	void simpleSort(int num)
+	{
+		int i, j;
+
+		for(i=0; i<num; i++)  // num개 만큼
+		{
+			for(j=i+1; j<gCnt; j++)  // 정렬 범위
+			{
+				if (G[i] < G[j])
+				{
+					int temp = G[i]; G[i] = G[j]; G[j] = temp;
+				}
+			}
+		}
+	}
+
+	int getSum(int num)
+	{
+		int i;
+		int sum = 0;
+		for(i=0; i<num; i++)
+		{
+			sum += G[i];
+		}
+
+		return sum;
+	}
+*/
+
+// 문제 A4: [TEST] 철도잇기	=> BFS
+#if 0
+#include <stdio.h>
+#define MAX_CT	(55)
+
+void In_Que(int data);
+int Out_Que(void);
+void Input(void);
+int Operation(void);
+int Find_Link(int s, int * v);
+int Simple_Sort_and_Get_Max(int no, int no2, int * g);
+void Print(void);
+
+int N;			// 철도역 수(정점, 노드)
+int M;			// 철도 수(간선, 링크)
+int K;			// 추가 철도 수
+int City[MAX_CT][MAX_CT];		// 인접 행렬
+int Que[MAX_CT];		//큐
+int Wp;
+int Rp;
+int max;
+
+int main(void)
+{
+	freopen("in_A4.txt", "r", stdin);
+	Input();
+	Print();
+
+	return 0;
+}
+
+// 큐에 데이터 집어넣음
+void In_Que(int data)
+{
+	Que[Wp++] = data;
+}
+
+// 큐에서 데이터 빼냄
+int Out_Que(void)
+{
+	return Que[Rp++];
+}
+
+// 철도 역, 연결 간선 수, 추가 연결 가능 간선 수 입력!
+void Input(void)
+{
+	int i;
+	int s, e;
+
+	scanf("%d %d %d", &N, &M, &K);
+	for (i = 0; i < M; i++)
+	{
+		scanf("%d %d", &s, &e);
+		City[s][e] = City[e][s] = 1;
+	}
+}
+
+// 시작정점이 여러 곳일 수 있으니, 1에서부터 방문된 곳은 시작 정점으로 주지 않고,
+// 방문하지 않은 철도역에 대해서 시작정점으로 다시 주어 그룹을 구하는 함수
+// 그 그룹은 후에 Group배열의 각 요소로 저장이 될 예정
+int Find_Link(int s, int * v)
+{
+	int out;
+	int i;
+	Wp = Rp = 0;
+
+	In_Que(s);
+	v[s] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Que();
+		for (i = 1; i <= N; i++)
+		{
+			if (City[out][i] == 1 && v[i] == 0)
+			{
+				In_Que(i);
+				v[i] = 1;
+			}
+		}
+	}
+	return Wp;	// 한 그룹에 몇 개의 도시가 연결되어 있냐를 리턴해주는 것!!
+}
+
+// 각 그룹의 개수를 내림차순으로 정렬하여 연결했을 때의 철도역 최대 수를 구하는 함수
+int Simple_Sort_and_Get_Max(int no, int no2, int * g)
+{
+	int i, j;
+	int tmp;
+	int sum;
+
+	for (i = 0; i < no; i++)			// K개의 Link가 있으므로 정렬은 그것 + 1개 만큼 더!
+	{
+		for (j = i + 1; j < no2; j++)
+		{
+			if (g[i] < g[j])
+			{
+				tmp = g[j];
+				g[j] = g[i];
+				g[i] = tmp;
+			}
+		}
+	}
+
+	sum = g[0];
+	for (i = 1; i <= K && g[i]; i++)
+	{
+		sum += g[i];
+	}
+
+	return sum;
+}
+
+// Operation 함수 속에서 그룹 나누고, 그룹의 수 및 철도역 수 구하고, 마지막으로 최대값도 구함
+int Operation(void)
+{
+	int Visit[MAX_CT] = { 0 };
+	int Group[MAX_CT] = { 0 };
+	int i, j;
+	int group_cnt = 0;
+	int tmp;
+
+	for (i = 1; i <= N; i++)
+	{
+		if (Visit[i] == 0) Group[group_cnt++] = Find_Link(i, Visit);
+		//printf("Group[%d] = %d\n", group_cnt - 1, Group[group_cnt - 1]);
+	}
+
+	max = Simple_Sort_and_Get_Max(K + 1, group_cnt, Group);
+	return max;
+}
+
+// 최대 철도역 수 프린트
+void Print(void)
+{
+	printf("%d\n", Operation());
+}
+#endif
+
+
+// 문제 A4: [TEST] 철도잇기	=> DFS
+#if 0
+#include <stdio.h>
+#define MAX_CT	(50 + 5)
+
+void Input(void);
+void FF_DFS(int d, int num);
+void Sort_Get_Max(int k);
+void Print(void);
+
+int N;
+int M;
+int K;
+int City[MAX_CT][MAX_CT];
+int Visit[MAX_CT];
+int Group[MAX_CT];
+int cnt;
+int group_cnt;
+int max;
+
+int main(void)
+{
+	int i;
+
+	freopen("in_A4.txt", "r", stdin);
+	Input();
+	for (i = 1; i <= N; i++)
+	{
+		if (Visit[i] != 0) continue;
+		cnt = 0;
+		FF_DFS(1, i);
+		Group[group_cnt++] = cnt;
+		printf("cnt = %d, group_cnt = %d\n", cnt, group_cnt);
+	}
+	Sort_Get_Max(K);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+	int s, e;
+
+	scanf("%d %d %d", &N, &M, &K);
+	for (i = 0; i < M; i++)
+	{
+		scanf("%d %d", &s, &e);
+		City[s][e] = City[e][s] = 1;
+	}
+}
+
+void FF_DFS(int d, int num)
+{
+	int i, sub_cnt = 1;
+
+	Visit[num] = 1;
+	cnt++;
+	printf("FF_DFS(int d = %d, int num = %d);\n", d, num);
+
+	for (i = 1; i <= N; i++)
+	{
+		if ( City[num][i] == 1 && Visit[i] == 0 )
+		{
+			FF_DFS(d + 1, i);
+		}
+
+	}
+}
+
+void Sort_Get_Max(int k)
+{
+	int i, j;
+	int tmp;
+
+	for (i = 0; i <= k; i++)
+	{
+		for (j = i + 1; j < group_cnt; j++)
+		{
+			if ( Group[i] < Group[j] )
+			{
+				tmp = Group[j];
+				Group[j] = Group[i];
+				Group[i] = tmp;
+			}
+		}
+	}
+
+	max = Group[0];
+	for (i = 1; i <= k; i++)
+	{
+		if( Group[i] ) max += Group[i];
+	}
+}
+
+// 최대 철도역 수 프린트
+void Print(void)
+{
+	printf("%d\n", max);
+}
+#endif
+
+
+
+
+
+// 문제 A5: [TST] 둘레(Bronze)	=> 일단 BFS로 풀어보기!
+// 근데 DFS로 푼다면... 100*100 = 10000 번 호출할 수도? => Stack Overflow
+// 그럼 DFS로는 못 푸나..? => 다른 접근 필요! => if문을 써서 좌상단, 우하단의 좌표를 구하고, 돌 수 있도록 함!
+
+/*
+	1) 정점 찾아보기 : 건초 -> type 2개 (x, y좌표), 10000개
+		=> typedef struct st { int x; int y; }NODE;
+	2) 간선 : 상하좌우!
+	3) 입력 설계 : 정점이 어디에 있는지 표시할 Map 필요!
+		=> Map[MAX][MAX];  // MAX = 100;
+	4) 큐 설계 : 정점 타입으로, 개수는 정점 개수.
+		=> QUE[MAX * MAX];
+		   int Wp, Rp;
+		   void In_Que(int data)
+		   {
+				Que[Wp].y = y;
+				Que[Wp++].x = x;
+		   }
+		   
+		   void Out_Que(void)
+		   {
+				return Queue[Rp++];
+		   }
+
+	5) 시작 정점 : (NODE) {0, 0};		or		(NODE) {minY - 1, minX - 1};
+
+	6) 인접 정점 : 상하좌우!
+		=> int dy[] = {-1, 1, 0, 0};
+		   int dx[] = {0, 0, -1, 1};
+		   for(i = 0; i < 4; i++)
+		   {
+				ny = out.y + dy[i];
+				nx = out.x + dx[i];
+				if(ny < 0 || nx < 0 || ny > 101 || nx > 101) continue;	// or 다른 숫자로 써둬서 1인지 아닌지만 찾도록 하는 방법도!
+				if(Map[ny][nx] == 1) Cir++;
+				else
+				{
+					In_Que(ny, nx);
+					Visit[ny][nx] = 1;
+				}
+		   }
+	7) 방문표시! (위에 있음!) : Visit[MAX][MAX];
+*/
+
+// 문제 A5: [TST] 둘레(Bronze)
+#if 0
+#include <stdio.h>
+#define MAX_F	(102)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}QUE;
+QUE queue[MAX_F * MAX_F];
+
+void Input(void);
+void In_Queue(int data_y, int data_x);
+QUE * Out_Queue(void);
+int FF_BFS(int sy, int sx);
+void Print(void);
+
+int N;		// 건초더미 수 : 1 ~ 10000
+int yy, xx;
+int Cir;
+int Field[MAX_F][MAX_F];
+int Wp;
+int Rp;
+
+int main(void)
+{
+	freopen("in_A5.txt", "r", stdin);
+	Input();
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d %d", &xx, &yy);
+		Field[yy][xx] = 1;
+	}
+}
+
+void In_Queue(int data_y, int data_x)
+{
+	queue[Wp].y = data_y;
+	queue[Wp++].x = data_x;
+}
+
+QUE * Out_Queue(void)
+{
+	return &(queue[Rp++]);
+}
+
+int FF_BFS(int sy, int sx)
+{
+	int i;
+	QUE * out;
+	int Visit[MAX_F][MAX_F] = { { 0, 0 }, };
+	int dy[4] = {-1, 0, 1, 0};
+	int dx[4] = {0, 1, 0, -1};
+	int ny, nx;
+	Wp = 0;
+	Rp = 0;
+
+	In_Queue(sy, sx);
+	Visit[sy][sx] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (ny < 0 || nx < 0 || ny > 101 || nx > 101) continue;
+			if (Field[ny][nx] == 1)	Cir++;
+			if (Field[ny][nx] == 0 && Visit[ny][nx] == 0)
+			{
+				In_Queue(ny, nx);
+				Visit[ny][nx] = 1;
+			}
+		}
+	}
+
+	return Cir;
+}
+
+void Print(void)
+{
+	printf("%d\n", FF_BFS(0, 0));
+}
+
+#endif
+
+
+
+
+
+// 둘레_DFS버전
+#if 0
+#include <stdio.h>
+#define MAX_F	(102)
+
+void Idnput(void);
+void Operation(void);
+void Print(void);
+
+int Field[MAX_F][MAX_F];
+int N;
+int yy, xx;
+int Cir;
+int Visit[MAX_F][MAX_F];
+
+int main(void)
+{
+	Input();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	for (i = 0; i < N; i++)
+	{
+		scanf("%d %d", &xx, &yy);
+		Field[yy][xx] = 1;
+	}
+}
+
+void Find_Corner(void)
+{
+	int i, j;
+	for (i = 1; i; i++)
+	{
+
+	}
+}
+
+void FF_DFS(int d, int num)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+
+
+
+// 문제 A6: [TST]단지 번호붙이기
+#if 0
+#include <stdio.h>
+#define MAX_MAP	(25 + 3)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}NODE;
+
+NODE Queue[MAX_MAP * MAX_MAP];				// 큐 : ★정점의 개수만큼 있어야 함!!!
+
+void Input(void);
+void Operation(void);
+int FF_BFS(int sy, int sx);
+void In_Queue(int yy, int xx);
+NODE * Out_Queue(void);
+void Sort(void);
+void Print(void);
+
+int N;
+int Map[MAX_MAP][MAX_MAP];			// 인접배열
+int Wp, Rp;
+int DanG[MAX_MAP * MAX_MAP];
+int DanG_cnt;
+int cnt;
+int Visit[MAX_MAP][MAX_MAP] = { { 0, 0 }, };
+
+int main(void)
+{
+	freopen("in_A6.txt", "r", stdin);
+	Input();
+	Operation();
+	Sort();
+	Print();
+
+	return 0;
+}
+
+void In_Queue(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp].x = xx;
+	Wp++;
+}
+
+NODE * Out_Queue(void)
+{
+	return &(Queue[Rp++]);
+}
+
+void Input(void)
+{
+	int i, j;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			scanf("%1d", &Map[i][j]);
+		}
+	}
+}
+
+int FF_BFS(int sy, int sx)
+{
+	int dx[4] = { -1, 0, 1, 0 };
+	int dy[4] = { 0, 1, 0, -1 };
+	int ny, nx;
+	int i;
+	NODE * out = (NODE *)0x0;
+	Wp = 0;
+	Rp = 0;
+	cnt = 0;
+
+	In_Queue(sy, sx);
+	Visit[sy][sx] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (ny < 1 || nx < 1 || ny > 25 || nx > 25) continue;
+			if ( (Map[ny][nx] == 1) && (Visit[ny][nx] == 0) )
+			{
+				In_Queue(ny, nx);
+				Visit[ny][nx] = 1;
+				cnt++;
+			}
+		}
+	}
+
+	return cnt;
+}
+
+void Operation(void)
+{
+	int i, j;
+	int check;
+
+	for (i = 0; i < MAX_MAP; i++)
+	{
+		for (j = 0; j < MAX_MAP; j++)
+		{
+			if ( Visit[i][j] == 0 )
+			{
+				check = FF_BFS(i, j);
+				if (check != 0) DanG[DanG_cnt++] = check;
+			}
+		}
+	}
+}
+
+void Sort(void)
+{
+	int i, j;
+	int tmp;
+
+	for (i = 0; i < DanG_cnt - 1; i++)
+	{
+		for (j = i + 1; j < DanG_cnt; j++)
+		{
+			if ( DanG[i] > DanG[j] )
+			{
+				tmp = DanG[j];
+				DanG[j] = DanG[i];
+				DanG[i] = tmp;
+			}
+		}
+	}
+}
+
+void Print(void)
+{
+	int i;
+	
+	printf("%d\n", DanG_cnt);
+	for (i = 0; i < DanG_cnt; i++)
+	{
+		printf("%d\n", DanG[i]);
+	}
+}
+
+#endif
+
+
+
+
+// 문제 A6: [TST]단지 번호붙이기
+#if 0
+#include <stdio.h>
+#define MAX_MAP	(25 + 3)
+
+void Input(void);
+void Operation(void);
+void FF_DFS(int d, int yy, int xx);
+void Sort(void);
+void Print(void);
+
+int N;
+int Map[MAX_MAP][MAX_MAP];			// 인접배열
+int DanG[MAX_MAP * MAX_MAP];
+int DanG_cnt;
+int cnt;
+int Visit[MAX_MAP][MAX_MAP] = { { 0, 0 }, };
+
+int main(void)
+{
+	freopen("in_A6.txt", "r", stdin);
+	Input();
+	Operation();
+	Sort();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i, j;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			scanf("%1d", &Map[i][j]);
+		}
+	}
+}
+
+void FF_DFS(int d, int yy, int xx)
+{
+	int dx[4] = { -1, 0, 1, 0 };
+	int dy[4] = { 0, 1, 0, -1 };
+	int ny, nx;
+	int i;
+
+	Visit[yy][xx] = 1;
+	cnt++;
+
+	for (i = 0; i < 4; i++)
+	{
+		ny = yy + dy[i];
+		nx = xx + dx[i];
+		if (Map[ny][nx] == 1 && Visit[ny][nx] == 0)
+		{
+			FF_DFS(d + 1, ny, nx);
+		}
+	}
+}
+
+void Operation(void)
+{
+	int i, j;
+
+	for (i = 1; i <= 25; i++)
+	{
+		for (j = 1; j <= 25; j++)
+		{
+			if (Map[i][j] == 1 && Visit[i][j] == 0)
+			{
+				cnt = 0;
+				FF_DFS(1, i, j);
+				DanG[DanG_cnt++] = cnt;
+			}
+		}
+	}
+}
+
+void Sort(void)
+{
+	int i, j;
+	int tmp;
+
+	for (i = 0; i < DanG_cnt - 1; i++)
+	{
+		for (j = i + 1; j < DanG_cnt; j++)
+		{
+			if (DanG[i] > DanG[j])
+			{
+				tmp = DanG[j];
+				DanG[j] = DanG[i];
+				DanG[i] = tmp;
+			}
+		}
+	}
+}
+
+void Print(void)
+{
+	int i;
+
+	printf("%d\n", DanG_cnt);
+	for (i = 0; i < DanG_cnt; i++)
+	{
+		printf("%d\n", DanG[i]);
+	}
+}
+
+#endif
+
+
+
+
+// 문제 A7: [TST]저글링 방사능 오염
+#if 0
+#include <stdio.h>
+#define MAX_STAR	(102)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}POS;
+
+POS Queue[MAX_STAR * MAX_STAR];
+
+void Input(void);
+int Operation(void);
+void In_Queue(int yy, int xx);
+POS * Out_Queue(void);
+void Irradiate_Zergling(int sy, int sx);
+void Print(void);
+
+int C;
+int R;
+int Map[MAX_STAR][MAX_STAR];
+int sX;
+int sY;
+int Wp;
+int Rp;
+int Max;
+
+int main(void)
+{
+	freopen("in_A7.txt", "r", stdin);
+	Input();
+	Irradiate_Zergling(sY, sX);
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i, j;
+
+	scanf("%d %d", &C, &R);
+	for (i = 1; i <= R; i++)
+	{
+		for (j = 1; j <= C; j++)
+		{
+			scanf("%1d", &Map[i][j]);		// 사실 맵을 그리면서 저글링의 전체 개수도 세는 것도 좋음!!
+		}
+	}
+	scanf("%d %d", &sX, &sY);
+}
+
+void In_Queue(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp++].x = xx;
+}
+
+
+POS * Out_Queue(void)
+{
+	return &(Queue[Rp++]);
+}
+
+void Irradiate_Zergling(int sy, int sx)
+{
+	POS * out = (POS *)0x0;
+	int ny, nx;
+	int i;
+	int dy[4] = {-1, 0 ,1, 0};
+	int dx[4] = {0 ,1, 0, -1};
+
+	In_Queue(sy, sx);
+	Map[sy][sx] = 3;
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sy = out->y;
+		sx = out->x;
+
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (ny < 1 || nx < 1 || ny > R || nx > C) continue;
+			if ( Map[ny][nx] == 1 )
+			{
+				In_Queue(ny, nx);
+				Map[ny][nx] = Map[sy][sx] + 1;
+			}
+			if (Map[ny][nx] > Max) Max = Map[ny][nx];
+		}
+	}
+}
+
+int Operation(void)
+{
+	int cnt = 0;
+	int i, j;
+
+	for (i = 1; i <= R; i++)
+	{
+		for (j = 1; j <= C; j++)
+		{
+			if (Map[i][j] == 1) cnt++;
+		}
+	}
+
+	return cnt;
+}
+
+void Print(void)
+{
+	printf("%d\n", (Max == 0) ? 3 : Max);
+	printf("%d\n", Operation());
+}
+
+#endif
+
+
+
+
+// 문제 A8: [TST]보물섬
+#if 0
+#include <stdio.h>
+#define MAX	(55)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}NODE;
+NODE Queue[MAX * MAX * MAX * MAX];
+
+void Input(void);
+void Operation(void);
+void In_Queue(int yy, int xx);
+NODE * Out_Queue(void);
+int FF_BFS(int sy, int sx);
+void Init_Visit(void);
+void Print(void);
+
+int Y, X;
+char Map[MAX][MAX];
+int Visit[MAX][MAX];
+int Wp, Rp;
+int Max;
+
+int main(void)
+{
+	freopen("in_A8.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d %d", &Y, &X);
+	for (i = 0; i < Y; i++)
+	{
+		scanf("%s", Map[i]);
+	}
+}
+
+void In_Queue(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp++].x = xx;
+}
+
+NODE * Out_Queue(void)
+{
+	return &(Queue[Rp++]);
+}
+
+int FF_BFS(int sy, int sx)
+{
+	NODE * out = (NODE *)0x0;
+	int ny, nx;
+	int i;
+	int dy[4] = {-1, 1, 0, 0};
+	int dx[4] = {0, 0, -1, 1};
+	int max = 0;
+
+	In_Queue(sy, sx);
+	max = Visit[sy][sx] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if ( ny < 0 || nx < 0 || ny >= Y || nx >= X ) continue;
+			if ( Map[ny][nx] == 'L' && Visit[ny][nx] == 0 )
+			{
+				In_Queue(ny, nx);
+				Visit[ny][nx] = Visit[sy][sx] + 1;
+				if (Visit[ny][nx] > max) max = Visit[ny][nx];
+			}
+		}
+	}
+	return max;
+}
+
+void Init_Visit(void)
+{
+	int i, j;
+	for (i = 0; i < Y; i++)
+	{
+		for (j = 0; j < X; j++)
+		{
+			Visit[i][j] = 0;
+		}
+	}
+}
+
+void Operation(void)
+{
+	int i, j, max = 0;
+
+	for (i = 0; i < Y; i++)
+	{
+		for (j = 0; j < X; j++)
+		{
+			if ( Map[i][j] != 'W' )
+			{
+				max = FF_BFS(i, j);
+				if (max > Max) Max = max;
+				Init_Visit();
+			}
+
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", Max - 1);
+}
+#endif
+
+// 문제 A8: [TST]보물섬	=> 다른 버전!!
+#if 0
+#include <stdio.h>
+#define MAX (55)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}NODE;
+NODE Queue[MAX * MAX];
+
+void Input(void);
+void Operation(void);
+void In_Queue(int yy, int xx);
+NODE * Out_Queue(void);
+int FF_BFS(int sy, int sx);
+void Init_Visit(void);
+void Print(void);
+
+int Y, X;
+char Map[MAX][MAX];
+int Wp, Rp;
+int Max;
+
+int main(void)
+{
+	//freopen("in_A8.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d %d", &Y, &X);
+	for (i = 0; i < Y; i++)
+	{
+		scanf("%s", Map[i]);
+	}
+}
+
+void In_Queue(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp++].x = xx;
+}
+
+NODE * Out_Queue(void)
+{
+	return &(Queue[Rp++]);
+}
+
+int FF_BFS(int sy, int sx)
+{
+	int Visit[MAX][MAX] = { { 0, 0 }, };
+	NODE * out = (NODE *)0x0;
+	int ny, nx;
+	int i;
+	int dy[4] = { -1, 1, 0, 0 };
+	int dx[4] = { 0, 0, -1, 1 };
+	int max = 0;
+	Wp = 0;
+	Rp = 0;
+
+	In_Queue(sy, sx);
+	max = Visit[sy][sx] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (ny < 0 || nx < 0 || ny >= Y || nx >= X) continue;
+			if (Map[ny][nx] == 'L' && Visit[ny][nx] == 0)
+			{
+				In_Queue(ny, nx);
+				Visit[ny][nx] = Visit[sy][sx] + 1;
+				if (Visit[ny][nx] > max) max = Visit[ny][nx];
+			}
+		}
+	}
+	return max;
+}
+
+void Operation(void)
+{
+	int i, j, max = 0;
+
+	for (i = 0; i < Y; i++)
+	{
+		for (j = 0; j < X; j++)
+		{
+			if (Map[i][j] != 'W')
+			{
+				max = FF_BFS(i, j);
+				if (max > Max) Max = max;
+			}
+
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", Max - 1);
+}
+#endif
+
+
+// 수정
+#if 0
+#include <stdio.h>
+#define MAX (55)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}NODE;
+NODE Queue[MAX * MAX];
+
+void Input(void);
+void Operation(void);
+void In_Queue(int yy, int xx);
+NODE * Out_Queue(void);
+int FF_BFS(int sy, int sx);
+void Init_Visit(void);
+void Print(void);
+
+int Y, X;
+char Map[MAX][MAX];
+int Wp, Rp;
+int Max;
+
+int main(void)
+{
+	freopen("in_A8.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d %d", &Y, &X);
+	for (i = 0; i < Y; i++)
+	{
+		scanf("%s", Map[i]);
+	}
+}
+
+void In_Queue(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp++].x = xx;
+}
+
+NODE * Out_Queue(void)
+{
+	return &(Queue[Rp++]);
+}
+
+int FF_BFS(int sy, int sx)
+{
+	int Visit[MAX][MAX] = { { 0, 0 }, };
+	NODE * out = (NODE *)0x0;
+	int ny, nx;
+	int i;
+	int dy[4] = { -1, 1, 0, 0 };
+	int dx[4] = { 0, 0, -1, 1 };
+	Wp = 0;
+	Rp = 0;
+
+	In_Queue(sy, sx);
+	Visit[sy][sx] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (ny < 0 || nx < 0 || ny >= Y || nx >= X) continue;
+			if (Map[ny][nx] == 'L' && Visit[ny][nx] == 0)
+			{
+				In_Queue(ny, nx);
+				Visit[ny][nx] = Visit[sy][sx] + 1;
+				//if (Visit[ny][nx] > max) max = Visit[ny][nx];	=> 쓸모 없는 조건!!
+			}
+		}
+	}
+
+	//printf("%d\n", Visit[sy][sx]);
+	return Visit[sy][sx] - 1;
+}
+
+void Operation(void)
+{
+	int i, j, max = 0;
+
+	for (i = 0; i < Y; i++)
+	{
+		for (j = 0; j < X; j++)
+		{
+			if (Map[i][j] != 'W')
+			{
+				max = FF_BFS(i, j);
+				if (max > Max) Max = max;
+			}
+
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", Max);
+}
+#endif
+
+// 문제 A8: [TST]보물섬	=> 또 다른 버전!!
+#if 0
+#include <stdio.h>
+#define MAX (55)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}NODE;
+NODE Queue[MAX * MAX];
+
+void Input(void);
+void Operation(void);
+void In_Queue(int yy, int xx);
+NODE * Out_Queue(void);
+int BFS(int sy, int sx);
+void Init_Visit(void);
+void Print(void);
+
+int Y, X;
+int Map[MAX][MAX];
+int Wp, Rp;
+int Max;
+
+int main(void)
+{
+	freopen("in_A8.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i, j;
+	char tmp[MAX] = { 0 };
+
+	scanf("%d %d", &Y, &X);
+	for (i = 1; i <= Y; i++)
+	{
+		scanf("%s", &tmp[1]);
+		for (j = 1; j <= X; j++)
+		{
+			if (tmp[j] == 'L') Map[i][j] = 1;
+		}
+	}
+}
+
+void In_Queue(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp++].x = xx;
+}
+
+NODE * Out_Queue(void)
+{
+	return &(Queue[Rp++]);
+}
+
+int BFS(int sy, int sx)
+{
+	int Visit[MAX][MAX] = { { 0, 0 }, };
+	NODE * out = (NODE *)0x0;
+	int ny, nx;
+	int i;
+	int dy[4] = { -1, 1, 0, 0 };
+	int dx[4] = { 0, 0, -1, 1 };
+
+	In_Queue(sy, sx);
+	Visit[sy][sx] = 1;
+
+	while (Wp > Rp)
+	{	// Out_Queue를 NODE 타입으로 해줘도 ㅋㅋㅋㅋ
+		out = Out_Queue();
+		sy = out->y;		// 어차피 이 다음에 sy, sx 쓰이는 곳 많잖아? 그러니까 애초에 다른 변수로 받아줘서
+		sx = out->x;		// .이나 -> 연산 줄이는 방법도!
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (Map[ny][nx] && Visit[ny][nx] == 0)
+			{
+				In_Queue(ny, nx);
+				Visit[ny][nx] = Visit[sy][sx] + 1;
+				//if (Visit[ny][nx] > max) max = Visit[ny][nx];	=> 쓸모 없는 조건!!
+			}
+		}
+	}
+	
+	//printf("%d\n", Visit[sy][sx]);
+	return Visit[sy][sx] - 1;
+}
+
+void Operation(void)
+{
+	int i, j, max = 0;
+	Max = 0;	// 여기서 초기화해줘야 좀 안전 ㅎㅎ
+
+	for (i = 1; i <= Y; i++)
+	{
+		for (j = 1; j <= X; j++)
+		{
+			if (Map[i][j] == 1)
+			{
+				Wp = Rp = 0;			// BFS의 바깥에서 초기화
+				max = BFS(i, j);
+				if (max > Max) Max = max;
+			}
+
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", Max);
+}
+#endif
+
+// 윤규형 ver.
+#if 0
+#include <stdio.h>
+
+#define QMAX 202
+
+typedef struct _point
+{
+	int y, x;
+} P;
+
+P dQ[] = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
+
+char map[52][53];
+int visited[52][52];
+P Qs[1250], Q[QMAX];
+int sidx, head, tail;
+int N, M, max;
+
+void init(void)
+{
+	int i, j;
+	for (i = 0; i < 52; ++i)
+	{
+		for (j = 0; j < 52; ++j)
+		{
+			map[i][j] = 0;
+			visited[i][j] = 0;
+		}
+	}
+	sidx = 0;
+	max = 0;
+}
+
+void chkS(int y, int x)
+{
+	int i, j, k;
+	int a[2] = { 0 };
+
+	for (i = 0; i < 4; ++i)
+	{
+		if (map[y + dQ[i].y][x + dQ[i].x] == 'L') a[i & 1]++;
+	}
+
+	if (a[0] == 2 || a[1] == 2) return;
+
+	Qs[sidx].y = y;
+	Qs[sidx].x = x;
+	sidx++;
+}
+
+void bfs(P s, int cnt)
+{
+	int k, t, ret = 0;
+	P c;
+
+	head = 0;
+	tail = 1;
+	t = 1;
+	Q[0].y = s.y;
+	Q[0].x = s.x;
+	visited[s.y][s.x] = cnt;
+	while (head != tail)
+	{
+		if (head == t) {
+			t = tail;
+			ret++;
+		}
+		c = Q[head++];
+		if (head >= QMAX) head -= QMAX;
+
+		for (k = 0; k < 4; ++k)
+		{
+			P n = { c.y + dQ[k].y, c.x + dQ[k].x };
+
+			if (!map[n.y][n.x] || visited[n.y][n.x] == cnt) continue;
+
+			visited[n.y][n.x] = cnt;
+			Q[tail++] = n;
+			if (tail >= QMAX) tail -= QMAX;
+		}
+	}
+
+	if (ret > max) max = ret;
+}
+
+int main(void)
+{
+	int i, j, cnt = 1;
+
+	init();
+
+	freopen("in_A8.txt", "r", stdin);
+
+	scanf("%d %d", &N, &M);
+	for (i = 1; i <= N; ++i)
+	{
+		scanf("%s", map[i] + 1);
+	}
+	for (i = 1; i <= N; ++i)
+	{
+		for (j = 1; j <= M; ++j)
+		{
+			if (map[i][j] == 'L') chkS(i, j);
+			else map[i][j] = 0;
+		}
+	}
+
+	for (i = 0; i < sidx; ++i)
+	{
+		bfs(Qs[i], cnt);
+		cnt++;
+	}
+	printf("%d\n", max);
+
+	return 0;
+}
+#endif
+
+
+
+// 최단거리 문제 아님!! => 자외선 최소의 문제!!
+// 문제 A9: [TST]자외선을 피해 가기
+#if 0
+#include <stdio.h>
+#define MAX_ARR	(102)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}NODE;
+NODE Queue[MAX_ARR * MAX_ARR * 4];  // 한 NODE를 여러 번 갱신/방문할 수 있기 때문이다!! 넉넉하게 잡음!
+
+void Input(void);
+void In_Queue(int yy, int xx);
+NODE Out_Queue(void);
+int BFS(int sy, int sx);
+//void Operation(void);
+void Print(void);
+
+int N;
+int Ultraviolet[MAX_ARR][MAX_ARR];	// 각각 0 ~ 9
+int Check_Min[MAX_ARR][MAX_ARR];
+int Wp, Rp;
+
+int main(void)
+{
+	freopen("in_A9.txt", "r", stdin);
+	Input();
+	//Operation();
+	Print();
+
+	return 0;
+}
+
+void In_Queue(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp++].x = xx;
+}
+
+NODE Out_Queue(void)
+{
+	return Queue[Rp++];
+}
+
+void Input(void)
+{
+	int i, j;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			scanf("%1d", &Ultraviolet[i][j]);
+			Check_Min[i][j] = 0x7ffffff0;
+		}
+	}
+}
+
+int BFS(int sy, int sx)
+{
+	NODE out = { 0 };
+	int ny, nx;
+	int i;
+	int check;
+	int dy[4] = { -1, 0, 1, 0 };
+	int dx[4] = { 0, 1, 0, -1 };
+
+	Wp = 0;
+	Rp = 0;
+
+	In_Queue(sy, sx);
+	Check_Min[sy][sx] = Ultraviolet[sy][sx];
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sy = out.y;
+		sx = out.x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (ny < 1 || nx < 1 || ny > N || nx > N) continue;
+			if (Check_Min[ny][nx] > Check_Min[sy][sx])
+			{
+				check = Check_Min[sy][sx] + Ultraviolet[ny][nx];
+				//printf("check = %d\n", check);
+				if (Check_Min[ny][nx] > check)
+				{
+					In_Queue(ny, nx);
+					Check_Min[ny][nx] = check;
+				}
+			}
+		}
+	}
+	return Check_Min[N][N];
+}
+
+//void Operation(void)
+//{
+//
+//
+//}
+
+void Print(void)
+{
+	//int i, j;
+
+	//for (i = 1; i <= N; i++)
+	//{
+	//	for (j = 1; j <= N; j++)
+	//	{
+	//		printf("%d ", Check_Min[i][j]);
+	//	}
+	//	printf("\n");
+	//}
+	printf("%d\n", BFS(1, 1));
+}
+#endif
+
+
+
+/*
+1. 정점 : 지하철 역(int 타입 / N개(3 ~ 100))
+2. ★입력 : 방향성!!(배열 잘 보면 조금 다른 값 있음 ㅋㅋ) && 가중치!!(배열에 적혀있는, 즉 비용, 시간이 다름)
+	int N, M;
+	int ARR[MAX][MAX];	(#define MAX  (102))
+	
+	scanf("%d %d", &N, &M);
+	for(i = 1; i <= N; i++)
+	{
+		for(j = 1; j <= N; j++)
+		{
+			scanf("%d", &ARR[i][j])
+		}
+	}
+
+3. 큐 설계 : int 타입 / 정점의 수는 음... MAX * MAX ?
+
+4. 시작 정점 : 1번 역!
+
+5. 도착 정점 : M번 역!
+
+6. 방문 표시 : 그대로 vs 따로 ??
+	=> ★★경험을 표시하는 것!!! : 출발 점에서 특정 지하철 역까지의 누적 최소 시간!!★★
+		Visit[MAX] = { 0x7fffffff };	// => 얘는 b와 같음!
+
+7. 인점 정점 : 
+	=> while(Wp > Rp)
+	   {
+			out = Out_Queue();
+			for(i = 2; i <= N; i++)
+			{
+				int t = b[out] + ARR[out][i];
+				if ( ARR[out][i] > 0 && b[i] > t)
+				{
+						In_Queue(i);
+						b[i] =  t;			// 시간
+						path[i] = out;		// 경로
+				}
+			}
+	   }
+
+
+	1 -> M번으로 가는 방법s 
+	*BFS : 주로 최단거리 이동(돌아가는 것 잘 안 씀)	- "가까운 것부터 다 해보고 그 다음으로 넘어간다"
+		=> But, 돌아가더라도 더욱 저렴하거나 시간이 덜 걸리는 경우가 있는데, 최소 비용, 시간을 구하는 것이라면?
+			DFS를 사용할 명분 - "일단 답 같은 것 하나를 얻고 시작하는 것."
+								or "일단 빠르게 목적지, 답 쪽으로 가보고 아니면 다른 시도!!" 같은 느낌
+
+*/
+// 문제 B0: [TST]지하철-SPJ
+#if 0
+#include <stdio.h>
+#define MAX	(102)
+
+typedef struct _st
+{
+	int Time_Sum;
+	int Path;
+}CHECK;
+
+CHECK Min[MAX * MAX];	// 똑같은 것이 또 들어갈 수 있으므로 넉넉하게 잡자!!!!
+
+void Input(void);
+void Operation(void);
+void In_Que(int a);
+int Out_Que(void);
+void BFS(int num);
+void Print(void);
+void Recursive_Print(int num);
+
+int Que[MAX * MAX];
+int N;
+int M;
+int Time_Input[MAX][MAX];
+int Wp, Rp;
+
+int main(void)
+{
+	freopen("in_B0.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+void In_Que(int a)
+{
+	Que[Wp++] = a;
+}
+
+int Out_Que(void)
+{
+	return Que[Rp++];
+}
+
+void Input(void)
+{
+	int i, j;
+
+	scanf("%d %d", &N, &M);
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			scanf("%d", &Time_Input[i][j]);
+		}
+		Min[i].Time_Sum = 0x7fffffff;
+	}
+}
+
+void BFS(int num)
+{
+	int out;
+	int i;
+	int check;
+	Wp = 0;
+	Rp = 0;
+
+	In_Que(num);
+	Min[num].Time_Sum = 0;
+	Min[num].Path = 0;
+
+	while (Wp > Rp)
+	{
+		out = Out_Que();
+		for (i = 2; i <= N; i++)
+		{
+			check = Min[out].Time_Sum + Time_Input[out][i];
+			if ( Time_Input[out][i] > 0 && Min[i].Time_Sum > check )
+			{
+				In_Que(i);
+				Min[i].Time_Sum = check;
+				Min[i].Path = out;
+			}
+		}
+	}
+}
+
+void Operation(void)
+{
+	BFS(1);
+}
+
+void Recursive_Print(int num)
+{
+	if (num == 0) return;
+	Recursive_Print(Min[num].Path);
+	printf("%d ", num);
+}
+
+void Print(void)
+{
+	printf("%d\n", Min[M].Time_Sum);
+	Recursive_Print(M);
+	printf("\n");
+}
+#endif
+
+
+
+
+// 문제 B1: [TST]등산로 찾기
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+
+#endif
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+#endif
