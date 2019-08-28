@@ -922,6 +922,294 @@ void Print(int d)
 #include <stdio.h>
 
 void Input(void);
+void DFS(int L, int idx, int ad);
+void Print(void);
+
+char duru[11];
+char devil[31];
+char angel[31];
+int len_duru;
+int len_bridge;
+int flag;
+int cnt;
+
+int main(void)
+{
+        Input();
+        DFS(0, 0, flag);
+        DFS(0, 0, -flag);
+        Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+        len_duru = 0;
+        len_bridge = 0;
+        flag = 1;       // 1 : angel, -1 : devil
+        cnt = 0;
+
+        scanf("%s", duru);
+        scanf("%s", devil);
+        scanf("%s", angel);
+
+        while(duru[len_duru]) len_duru++;
+        while(angel[len_bridge]) len_bridge++;
+}
+
+void DFS(int L, int idx, int ad)
+{
+        int i;
+
+        if(L >= len_duru)
+        {
+                cnt++;
+                return;
+        }
+
+        for(i = idx; i < len_bridge; i++)
+        {
+                if(ad == 1)
+                {
+                        if(angel[i] != duru[L]) continue;
+                        DFS(L + 1, i + 1, -ad);
+                }
+                else
+                {
+                        if(devil[i] != duru[L]) continue;
+                        DFS(L + 1, i + 1, -ad);
+                }
+        }
+}
+
+void Print(void)
+{
+        //printf("len_duru = %d, len_bridge = %d\n", len_duru, len_bridge);
+        printf("%d\n", cnt);
+}
+#endif
+
+
+
+
+
+// 문제 C1: [TST]건물세우기(BASIC2)
+#if 0
+#include <stdio.h>
+#define MAX     (15)
+
+void Input(void);
+void DFS(int L,int place, int sum);
+void Print(void);
+
+int n;                         // 빌딩의 개수 : 1 ~ 10
+int Cost[MAX][MAX];            // 빌딩의 비용 입력
+int Cost_Mix[MAX];             // 건물 비용 조합
+int Place_Check[MAX];
+int Min;
+int cnt;
+
+int main(void)
+{
+        int i;
+
+        Input();
+        DFS(1, 1, 0);
+        Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+        int i, j;
+
+        Min = 10000;
+        scanf("%d", &n);
+        for(i = 1; i <= n; i++)
+        {
+                for(j = 1; j <= n; j++)
+                {
+                        scanf("%d", &Cost[i][j]);
+                }
+        }
+}
+
+void DFS(int L,int place, int sum)
+{
+        int i;
+
+        if(L > n)
+        {
+                //printf("%d : sum = %d\n", ++cnt, sum);
+                if(Min > sum) Min = sum;
+                //printf("%d : Min = %d\n", cnt, Min);
+                return;
+        }
+
+        for(i = 1; i <= n; i++)
+        {
+                if(Place_Check[i]) continue;
+                Place_Check[i] = 1;
+                Cost_Mix[L] = Cost[L][i];
+
+                DFS(L + 1, i, sum + Cost[L][i]);
+
+                Place_Check[i] = 0;
+                Cost_Mix[L] = 0;
+        }
+}
+
+void Print(void)
+{
+        printf("%d\n", Min);
+}
+#endif
+
+
+
+
+// 문제 A1: [TEST] 쥐와고양이
+#if 0
+#include <stdio.h>
+#define MAX     (15)
+#define ABS(x1, x2)     ( ((x) < 0) ? -(x) : (x) )
+
+typedef struct _st
+{
+      int y;
+      int x;
+}OBJECT;
+OBJECT seed[8];
+OBJECT cat;
+OBJECT mouse;
+
+void Input(void);
+void Move_Mouse(int sn);
+void Move_Cat(void);
+void GAME(void);
+void Print(void);
+
+int N;
+int flag;
+int mcflag;
+int mrflag;
+int ccflag;
+int crflag;
+int seed_num;
+int dy[3] = { 0, 1, -1 };
+int dx[3] = { 0, 1, -1 };
+int mcnt;
+int ccnt;
+
+int main(void)
+{
+        Input();
+        GAME();
+        Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+        int i;
+
+        scanf("%d", &N);
+        for(i = 1; i <= N; i++)
+        {
+                scanf("%d %d", &(seed[i].x), &(seed[i].y));
+        }
+        seed[i].x = 0;
+        seed[i].y = 1;
+        scanf("%d %d", &(cat.x), &(cat.y));
+        mouse.x = seed[1].x;
+        mouse.y = seed[1].y;
+        flag = 0;
+        seed_num = 2;
+}
+
+void Move_Mouse(int sn)
+{
+        if(seed[sn].x == mouse.x)
+        {
+                mcflag = 0;
+                if(seed[sn].y == mouse.y) mrflag = 0;
+                else if(seed[sn].y > mouse.y) mrflag = 1;
+                else if(seed[sn].y < mouse.y) mrflag = 2;
+
+                mouse.y += dy[mrflag];
+        }
+        else if(seed[sn].x > mouse.x) mcflag = 1;
+        else if(seed[sn].x < mouse.x) mcflag = 2;
+        mouse.x += dx[mcflag];
+
+        //printf("[%d] mouse.x = %d, mouse.y = %d\n", ++mcnt, mouse.x, mouse.y);
+}
+
+void Move_Cat(void)
+{
+        if(mouse.y == cat.y)
+        {
+                crflag = 0;
+                if(mouse.x == cat.x) ccflag = 0;
+                else if(mouse.x > cat.x) ccflag = 1;
+                else if(mouse.x < cat.x) ccflag = 2;
+
+                cat.x += dy[ccflag];
+                if(mouse.x != cat.x) cat.x += dy[ccflag];
+        }
+        else if(mouse.y > cat.y) crflag = 1;
+        else if(mouse.y < cat.y) crflag = 2;
+
+        cat.y += dy[crflag];
+        if(mouse.y != cat.y) cat.y += dy[crflag];
+
+        //printf("[%d] cat.x = %d, cat.y = %d\n", ++ccnt, cat.x, cat.y);
+}
+
+void GAME(void)
+{
+        if(flag) return;
+        for( ; ; )
+        {
+                Move_Cat();
+                if(cat.x == mouse.x && cat.y == mouse.y) break;
+                if(cat.x == 1 && cat.y == 1) break;
+
+                Move_Mouse(seed_num);
+                if(mouse.x == seed[seed_num].x && mouse.y == seed[seed_num].y)
+                {
+                        if(seed_num == N + 1)
+                        {
+                                flag = 1;
+                                break;
+                        }
+                        seed_num++;
+                        mrflag = 0;
+                        mcflag = 0;
+                }
+        }
+}
+
+void Print(void)
+{
+        printf("%d\n", flag);
+}
+#endif
+
+
+
+
+// 
+#if 0
+#include <stdio.h>
+
+void Input(void);
 void Operation(void);
 void Print(void);
 
