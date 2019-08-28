@@ -1,0 +1,948 @@
+// <20190828 수요일>
+// 문제 B1: [TST]등산로 찾기
+#if 0
+#include <stdio.h>
+#define MAX (110)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}MOUNTAIN;
+//MOUNTAIN QUE[MAX * MAX * MAX];  // 넉넉(?)하게
+MOUNTAIN QUE[MAX * MAX * 20];  // 넉넉(?)하게
+
+void Input(void);
+void In_Queue(int yy, int xx);
+MOUNTAIN * Out_Queue(void);
+int BFS(void);
+void Print(void);
+
+int n;          // n * n
+int sy, sx;     // summit
+int Mount[MAX][MAX];
+int Wp, Rp;
+int Effort[MAX][MAX];
+
+int main(void)
+{
+	freopen("in_B1.txt", "r", stdin);
+	Input();
+	Print();
+
+	return 0;
+}
+
+void In_Queue(int yy, int xx)
+{
+	QUE[Wp].y = yy;
+	QUE[Wp++].x = xx;
+}
+
+MOUNTAIN * Out_Queue(void)
+{
+	return &(QUE[Rp++]);
+}
+
+void Input(void)
+{
+	int i, j;
+	Wp = 0;
+	Rp = 0;
+
+	scanf("%d", &n);
+	scanf("%d %d", &sy, &sx);
+	for (i = 1; i <= n; i++)
+	{
+		for (j = 1; j <= n; j++)
+		{
+			scanf("%d", &Mount[i][j]);
+			if (i == 1 || i == n)
+			{
+				Effort[i][j] = Mount[i][j] * Mount[i][j];
+				In_Queue(i, j);
+			}
+			else if (j == 1 || j == n)
+			{
+				Effort[i][j] = Mount[i][j] * Mount[i][j];
+				In_Queue(i, j);
+			}
+		}
+	}
+
+	for (i = 2; i <= n - 1; i++)
+	{
+		for (j = 2; j <= n - 1; j++)
+		{
+			Effort[i][j] = 9999999;
+		}
+	}
+}
+
+int BFS(void)
+{
+	MOUNTAIN * out = (MOUNTAIN *)0x0;
+	int i, j;
+	int check;
+	int xx, yy;
+	int ny, nx;
+	int dy[4] = { -1, 1, 0, 0 };
+	int dx[4] = { 0, 0, -1, 1 };
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		yy = out->y;
+		xx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = yy + dy[i];
+			nx = xx + dx[i];
+			
+			// <여기서부터 불필요한 코드 수정! 위가 기존, 아래가 수정>
+
+			//if (ny < 1 || nx < 1 || ny > n || nx > n) continue;
+			if (Mount[ny][nx] == 0) continue;
+
+			//if (Mount[yy][xx] == Mount[ny][nx])
+			//{
+			//	check = Effort[yy][xx];
+			//}
+			//else if (Mount[yy][xx] > Mount[ny][nx])
+			//{
+			//	check = Effort[yy][xx] + Mount[yy][xx] - Mount[ny][nx];
+			//}
+			//else //if(Mount[yy][xx] < Mount[ny][nx])
+			//{
+			//	check = Effort[yy][xx] + (Mount[ny][nx] - Mount[yy][xx]) * (Mount[ny][nx] - Mount[yy][xx]);
+			//}
+			check = Mount[yy][xx] - Mount[ny][nx];
+			if (check < 0) check *= check;	// 올라가는 상황이냐? 그럼 제곱!! 아니면 그대로 유지!!
+			check += Effort[yy][xx];
+
+
+			if (Effort[ny][nx] > check)
+			{
+				Effort[ny][nx] = check;
+				In_Queue(ny, nx);
+			}
+
+//			if (ny == sy && nx == sx) break;
+//			가장 좋은 값으로 갱신하고 있는 문제이기 때문에 break 걸어주면 매우 위험!!
+		}
+	}
+
+	return Effort[sy][sx];
+}
+
+void Print(void)
+{
+//	int i, j;
+
+	printf("%d\n", BFS());
+
+	//for (i = 1; i <= n; i++)
+	//{
+	//	for (j = 1; j <= n; j++)
+	//	{
+	//		printf("%d ", Effort[i][j]);
+	//	}
+	//	printf("\n");
+	//}
+}
+#endif
+
+// 민창님 ver.
+//void BFS(void)
+//{
+//	int i, j;
+//	POS out;
+//	int nr, nc;
+//	int t;
+//
+//	wp = rp = 0;
+//
+//	for (i = 0; i <= N + 1; i++)
+//	{
+//		for (j = 0; j <= N + 1; j++)
+//		{
+//			if (b[i][j] == 0)
+//			{
+//				InQueue(i, j);
+//			}
+//		}
+//	}
+//	while (rp < wp)
+//	{
+//		out = OutQueue();
+//		for (i = 0; i < 4; i++)
+//		{
+//
+//			nr = out.r + dr[i];
+//			nc = out.c + dc[i];
+//
+//			if (nr < 1 || nc < 1 || nr > N || nc > N) continue;
+//
+//			t = a[out.r][out.c] - a[nr][nc];
+//			if (t < 0) t *= t;
+//			t = b[out.r][out.c] + t;
+//			if (t < b[nr][nc]) {
+//
+//				InQueue(nr, nc);
+//				b[nr][nc] = t;
+//			}
+//		}
+//	}
+//
+//
+//}
+
+
+
+
+
+
+// 문제 B2: [TST]장기
+#if 0
+#include <stdio.h>
+#define MAX	(110)
+
+typedef struct _st
+{
+	int y;
+	int x;
+}NODE;
+
+NODE QUEUE[MAX * MAX];	// 정점 수
+
+void Input(void);
+void In_Queue(int yy, int xx);
+NODE * Out_Queue(void);
+int BFS(int sy, int sx);
+//void Operation(void);
+void Print(void);
+
+int N;	// 행(세로)의 수
+int M;	// 열(가로)의 수	- 둘 다 1 ~ 100
+int mal_r, mal_c;
+int jol_r, jol_c;
+int Wp, Rp;
+//int Visit[MAX][MAX];
+
+int main(void)
+{
+	//freopen("In_B2.txt", "r", stdin);
+	Input();
+//	Operation();
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	scanf("%d %d", &N, &M);
+	scanf("%d %d %d %d", &mal_r, &mal_c, &jol_r, &jol_c);
+}
+
+void In_Queue(int yy, int xx)
+{
+	QUEUE[Wp].y = yy;
+	QUEUE[Wp++].x = xx;
+}
+
+NODE * Out_Queue(void)
+{
+	return &(QUEUE[Rp++]);
+}
+
+int BFS(int sy, int sx)
+{
+	NODE * out = (NODE *)0x0;
+	int Visit[MAX][MAX] = { 0 };
+	int ny, nx;
+//	int jy, jx;
+	int i;
+	int dy[8] = { -2, -1, 1, 2, 2, 1, -1, -2 };
+	int dx[8] = { -1, -2, -2, -1, 1, 2, 2, 1 };
+	Wp = 0;
+	Rp = 0;
+
+	In_Queue(sy, sx);
+	Visit[sy][sx] = 1;
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 8; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (ny < 1 || nx < 1 || ny > N || nx > M) continue;
+			if (Visit[ny][nx] == 0)
+			{
+				In_Queue(ny, nx);
+				Visit[ny][nx] = Visit[sy][sx] + 1;
+				if (ny == jol_r && nx == jol_c) return Visit[jol_r][jol_c] - 1;
+			}
+
+			//for (j = 0; j < 8; j++)
+			//{
+			//	jy = jol_r + dy[i];
+			//	jx = jol_c + dx[i];
+			//	if (ny == jy && nx == jx) return Visit[ny][nx] + 1;
+			//}
+		}
+	}
+
+//	if (Visit[jol_r][jol_c] == 0) Visit[jol_r][jol_c]++;
+//  못 잡으면 -1로 리턴값을 주고 싶어서...
+	return -1;
+}
+
+//void Operation(void)
+//{
+//
+//
+//}
+
+void Print(void)
+{
+//	int i, j;
+
+	printf("%d\n", BFS(mal_r, mal_c));
+	//for (i = 1; i <= N; i++)
+	//{
+	//	for (j = 1; j <= M; j++)
+	//	{
+	//		printf("%d ", Visit[i][j]);
+	//	}
+	//	printf("\n");
+	//}
+}
+#endif
+
+
+
+
+/*
+	<재귀함수 구조>
+	- 종료조건
+	- 먼저 수행
+	- 재귀 호출
+	- 나중 수행
+*/
+
+// 문제 B3: [EX]삼각형 별그리기 by 재귀
+#if 0
+#include <stdio.h>
+
+void Operation_Print(int N);
+
+int A;
+
+int main(void)
+{
+	scanf("%d", &A);
+
+	Operation_Print(A);
+
+	return 0;
+}
+
+void Operation_Print(int N)
+{
+	// A == 1이 되었을 때 끝!
+	if (A == 1) return;
+
+	// N이 0이 되었을 때 N을 A로 초기화 (A는 입력받은 값에서 하나씩 줄어듦)
+	if (N == 0)
+	{
+		printf("\n");
+		N = --A;
+	}
+
+	// 가로 별 찍기 (N == A에서 N == 1까지)
+	printf("*");
+	Operation_Print(N - 1);			// 재귀호출 인수로 --N 이런 표현 되도록 안 쓰도록!! => N - 1로 하자
+									// (전역)변수 자체가 변화하기 때문! 받은 값을 되도록이면 안 바꾸도록!!
+}
+
+
+// 유정님 ver.
+//void Print_Stars(int r, int c)
+//{
+//	int i;
+//
+//	if (r == 1) return;
+//	if (c == 0)
+//	{
+//		r--;
+//		c = r;
+//		printf("\n");
+//	}
+//
+//	printf("*");
+//	Print_Stars(r, c - 1);
+//}
+
+
+// 윤규형 ver.
+//int func2(int n)
+//{
+//	if (n == 0) return;
+//	printf("*");
+//	func2(n - 1);
+//}
+//
+//int func(int n)
+//{
+//	if (n == 0) return;
+//	func2(n);
+//	printf("\n");
+//	func(n - 1);
+//}
+#endif
+
+
+
+/*
+<재귀함수 구조>
+- 종료조건
+- 먼저 수행
+- 재귀 호출
+- 나중 수행
+*/
+
+// 문제 B4: [TST]별 그리기 6
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation_Print(int n);
+void Operation_Print2(int n);
+
+int N;
+//int A;
+//int B;
+//int flag;
+
+int main(void)
+{
+	Input();
+	Operation_Print(1);
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	scanf("%d", &N);
+}
+
+//void Operation_Print(int n)
+//{
+//	if (n == 0)
+//	{
+//		flag = 0;
+//		return;
+//	}
+//
+//	// 스페이스
+//	if (B > A)
+//	{
+//		printf("\n");
+//		B = 0;
+//		if( flag ) A--;
+//		else       A++;
+//	}
+//	else   // 별 가로 찍기
+//	{
+//		printf("*");
+//		B++;
+//	}
+//
+//	// 정점에서 꺾기
+//	if (B == n)
+//	{
+//		flag = 1;
+//		n--;
+//	}
+//
+//	// 재귀
+//	Operation_Print(n);
+//}
+
+
+void Operation_Print(int n)
+{
+	Operation_Print2(n);
+	printf("\n");
+	if (n == N) return;
+	Operation_Print(n + 1);
+	Operation_Print2(n);
+	printf("\n");
+}
+
+void Operation_Print2(int n)
+{
+	if (n == 0) return;
+	Operation_Print2(n - 1);
+	printf("*");
+}
+#endif
+
+
+
+
+// 문제 B5: [TST]1~n까지의 합 (Recursion Version)
+#if 0
+#include <stdio.h>
+
+void Input(void);
+int Operation(int N);
+
+int n;
+
+int main(void)
+{
+	Input();
+
+	printf("%d\n", Operation(n));
+
+	return 0;
+}
+
+void Input(void)
+{
+	scanf("%d", &n);
+}
+
+int Operation(int N)
+{
+	if (N == 1) return 1;
+	return ( N + Operation(N - 1) );
+}
+#endif
+
+
+
+/* 
+			모든 조합!!!!!!
+	
+*/
+// 
+#if 0
+#include <stdio.h>
+#define MAX	(20)
+
+void Input(void);
+void DFS(int d, int S);
+void Print_List(int D);
+
+int N;					  // 구슬 3개
+int a[MAX];				  //구슬
+//int b[3];				  // 구슬을 담을 상자
+int List[MAX];
+int L_cnt;
+
+int main(void)
+{
+	int sum = 0;
+
+	Input();
+	DFS(1, sum);				// 첫 번째 구슬부터!( = Level, Depth)
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &a[i]);
+	}
+}
+
+void DFS(int d, int S)		  //no는 구슬(a배열의 index)
+{
+	//Print_List(d);
+
+	//1] 리턴조건 : N번째이면 인쇄후 리턴
+	if (d > N)
+	{
+		printf("%2d (%2d): ", ++L_cnt, S);
+		Print_List(d);
+		return;
+	}
+
+	//2] 현재구슬을 고르기(a -> List배열에 담기)	=>	사용한다!!!!!
+	List[d] = a[d];
+	DFS(d + 1, S + a[d]);
+
+	//3] 현재 구슬을 고르지 않기(a -> List배열에 담지 않기)		=>	사용하지 않는다!!!!!
+	List[d] = 0;
+	DFS(d + 1, S);
+}
+
+void Print_List(int D)
+{
+	int i;
+
+	for (i = 1; i < D; i++)
+	{
+		printf("%3d", List[i]);
+		// 디버깅 용으로 사용할 수 있으므로 %2d, %3d와 같이 예쁘게 정렬(?)하자
+	}
+	printf("\n");
+}
+#endif
+
+
+
+
+
+// 문제 B6: [TST] 구슬 고르기1
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void DFS(int d);
+void Operation(void);
+void Print(void);
+
+int ARR[3] = { 2, 5, 7 };
+int List[3];
+int N = 3;
+
+int main(void)
+{
+	DFS(0);
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void DFS(int d)
+{
+	if (d > N - 1)	// d는 배열의 요소 번호이므로!!!
+	{
+		Print();
+		return;
+	}
+
+	List[d] = ARR[d];
+	DFS(d + 1);
+
+	List[d] = 0;
+	DFS(d + 1);
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+	int i;
+
+	for (i = 0; i < N; i++)
+	{
+		printf("%d ", List[i]);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+/*
+자연수들을 주고, 그 중에 몇 개의 수를 골라서 그 합이 K가 될 수 있는지 알아보라고 시켰다.
+철수 어머니가 자연수들을 무작위로 선택해서 본인도 가능한지 아닌지 모르고 있다.
+=> 몇 개 뽑는지 모름~!
+*/
+// 문제 B9: [TST] 더하기
+#if 0
+#include <stdio.h>
+#define MAX	(100001)
+
+void Input(void);
+void Init(void);
+void DFS(int d, int Sum);
+void Print(void);
+void Print_DB(int d, int sum);
+
+int T;
+int N;			// 5 ~ 20
+int K;			// 1 ~ 2000000
+int di[MAX];
+int List[MAX];	// 필요 없음!!!	=>	디버깅용!!!
+int Sum;
+int Check_Sum[MAX];
+int flag;
+
+int cnt;
+
+int main(void)
+{
+	int i;
+
+	freopen("in_B9.txt", "r", stdin);
+	scanf("%d", &T);
+	for (i = 1; i <= T; i++)
+	{
+		Input();
+		//if (Check_Sum[1] < K)
+		//{
+		//	Print();
+		//	continue;
+		//}				=> 이런 조건들도 DFS 함수 안에서 바로 빠져나올 수 있도록 설게!!
+		DFS(1, Sum);
+		Print();
+		Init();
+	}
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d %d", &N, &K);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &di[i]);
+	}
+
+	Check_Sum[N] = di[N];
+	for (i = N - 1; i >= 1; i--)
+	{
+		Check_Sum[i] = Check_Sum[i + 1] + di[i];
+	}
+}
+
+void Init(void)
+{
+	int i;
+
+	flag = 0;
+	Sum = 0;
+	for (i = 1; i <= N; i++)
+	{
+		di[i] = List[i] = Check_Sum[i] = 0;
+	}
+}
+
+void DFS(int d, int sum)
+{
+	//if (d > N)
+	//{
+	//		if (sum == K) flag = 1;
+	//		return;
+	//}						// => 이런 식으로 리턴값을 주기도 함!! 5번 찰 때마다 검사
+							//	  매번 같은 지 안 물어봐도 되는 장점. 하지만 따로 빼면 답을 더 빨리 찾을 수도.
+							//    테스트 케이스마다 다르다!
+	Print_DB(d, sum);
+	if (sum == K)
+	{
+		flag = 1;
+		return;
+	}
+	if ( flag || ( d > N ) || ( Check_Sum[d] < K - sum ) || ( sum > K ) ) return;
+	//=> return은 함수를 완전 끝내는 것이 아니라, 한 겹 나가는 것. 계속 리턴으로 빠져나가자!!
+
+	List[d] = 0;
+	DFS(d + 1, sum);
+
+	List[d] = di[d];
+	DFS(d + 1, sum + di[d]);
+}
+
+void Print(void)
+{
+	printf("%s\n", ( flag ) ? "YES" : "NO");
+}
+
+void Print_DB(int d, int sum)
+{
+	int i;
+
+	printf("%2d (%2d ) : ", ++cnt, sum);
+	for (i = 1; i <= N; i++)
+	{
+		printf("%2d ", List[i]);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+
+
+
+// 문제 B7: [TST] 구슬 고르기2
+#if 0
+#include <stdio.h>
+
+void DFS(int cnt, int s_idx);
+void Print(void);
+
+int ARR[6] = { 0, 1, 3, 4, 7, 9 };
+int List[6];
+int N = 5;		// 5개 중
+int pick = 2;	// 2개 고름(조합)
+int L_cnt;		// 디버그용
+
+int main(void)
+{
+	DFS(1, 1);    // List[1]번에 담기 시작, ARR[1]번 구슬부터 조합
+
+	return 0;
+}
+
+void DFS(int d, int s_idx)  // d는 가지, s_idx는 구슬 시작 요소
+{
+	int i;
+
+
+
+	//1] 리턴조건 : 2개째 고른후 인쇄후 리턴 (d가 +1이 되어 2개째 호출 되면 끝)
+	if (d > pick)
+	{
+		Print();
+		return;
+	}
+
+	//2] 리턴조건 : s_idx(요소 번호)가 N(5)보다 크면 리턴
+	if (s_idx > N)	return;
+
+	//3] ARR배열에서 1부터 N(5)까지 고르는 모든 경우
+	for (i = s_idx; i <= N - pick + d; i++)
+	{
+		List[d] = ARR[i];
+		DFS(d + 1, i + 1);
+	}
+}
+
+void Print(void)
+{
+	int i;
+
+	//printf("%2d : ", ++L_cnt);
+	for (i = 1; i <= pick; i++)
+	{
+		printf("%d ", List[i]);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+// 순열!!
+// 문제 B8: [TST] 구슬 고르기3
+#if 0
+#include <stdio.h>
+
+void DFS(int n);
+void Print(void);
+
+int ARR[3] = { 2, 5, 7 };	// 구슬
+int BASKET[3];				// 구슬 담을 상자
+int chk[3];					// 체크 배열
+int N = 3;					// 구슬 3개
+int L_cnt;
+
+int main(void)
+{
+	DFS(0);					// 0번 요소, 즉 ARR[0]에서부터 시작!!
+
+	return 0;
+}
+
+
+void DFS(int d)
+{
+	int i;
+
+	//1] 리턴조건 : 3개를 고른후 인쇄후 리턴
+	if (d == N)
+	{
+		Print();
+		return;
+	}
+
+	//2] a배열에서 0부터 N전까지 고르는 모든 경우(단 구슬의 중복을 배제)
+	for (i = 0; i < N; i++)
+	{
+		if ( chk[i] ) continue;
+		chk[i] = 1;		// ★
+		BASKET[d] = ARR[i];
+		DFS(d + 1);
+		chk[i] = 0;		// ★
+	}
+}
+
+void Print(void)
+{
+	int i;
+
+	//printf("%2d : ", ++L_cnt);
+	for (i = 0; i < N; i++)
+	{
+		printf("%d ", BASKET[i]);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+
+// 문제 C0: [TST]돌다리 건너기(BASIC)
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+#endif
