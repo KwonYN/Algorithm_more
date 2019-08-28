@@ -860,7 +860,7 @@ void Print(void)
 #include <stdio.h>
 
 void DFS(int n);
-void Print(void);
+void Print(int d);
 
 int ARR[3] = { 2, 5, 7 };	// 구슬
 int BASKET[3];				// 구슬 담을 상자
@@ -883,7 +883,7 @@ void DFS(int d)
 	//1] 리턴조건 : 3개를 고른후 인쇄후 리턴
 	if (d == N)
 	{
-		Print();
+		Print(d);
 		return;
 	}
 
@@ -893,17 +893,20 @@ void DFS(int d)
 		if ( chk[i] ) continue;
 		chk[i] = 1;		// ★
 		BASKET[d] = ARR[i];
+
 		DFS(d + 1);
+
 		chk[i] = 0;		// ★
+		BASKET[d] = 0;
 	}
 }
 
-void Print(void)
+void Print(int d)
 {
 	int i;
 
 	//printf("%2d : ", ++L_cnt);
-	for (i = 0; i < N; i++)
+	for (i = 0; i < d; i++)
 	{
 		printf("%d ", BASKET[i]);
 	}
