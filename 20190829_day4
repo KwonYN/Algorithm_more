@@ -1,0 +1,1330 @@
+// 순열!!
+// 문제 B8: [TST] 구슬 고르기3
+#if 0
+#include <stdio.h>
+
+void DFS(int n);
+void Print(int d);
+
+int ARR[3] = { 2, 5, 7 };	// 구슬
+int BASKET[3];				// 구슬 담을 상자
+int chk[3];					// 체크 배열
+int N = 3;					// 구슬 3개
+int L_cnt;
+
+int main(void)
+{
+	DFS(0);					// 0번 요소, 즉 ARR[0]에서부터 시작!!
+
+	return 0;
+}
+
+
+void DFS(int d)
+{
+	int i;
+
+	//1] 리턴조건 : 3개를 고른후 인쇄후 리턴
+	if (d == N)		// N을 뽑아야 하는 개수 R로 바꾸면 됨!!!
+	{
+		Print(d);
+		return;
+	}
+
+
+	//2] a배열에서 0부터 N전까지 고르는 모든 경우(단 구슬의 중복을 배제)
+	for (i = 0; i < N; i++)
+	{
+		if ( chk[i] ) continue;
+		chk[i] = 1;		// ★
+		BASKET[d] = ARR[i];
+
+		DFS(d + 1);
+
+		chk[i] = 0;		// ★
+		BASKET[d] = 0;
+	}
+}
+
+void Print(int d)
+{
+	int i;
+
+	//printf("%2d : ", ++L_cnt);
+	for (i = 0; i < d; i++)
+	{
+		printf("%d ", BASKET[i]);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+
+
+
+// ★문제 C0: [TST]돌다리 건너기(BASIC)
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void DFS(int L, int idx, int ad);
+void Print(void);
+
+char duru[11];
+//char devil[31];		// 2차원 배열로 만들어 줬다면,,
+//char angel[31];		// DFS 함수가 더욱 짧아졌을 것!
+char ande[2][31];
+int len_duru;
+int len_bridge;
+int cnt;
+
+int main(void)
+{
+	Input();
+	//DFS(0, 0, 1);
+	//DFS(0, 0, -1);
+	DFS(0, 0, 1);
+	DFS(0, 0, 0);
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	len_duru = 0;
+	len_bridge = 0;
+	cnt = 0;
+
+	scanf("%s", duru);
+
+	//scanf("%s", devil);			// 수정 전 : 1차원 배열 2개
+	//scanf("%s", angel);
+	scanf("%s", ande[0]);			//★수정 후 : 2차원 배열 1개 ("악마 <-> 천사"는 1과 0으로, ad와 !ad로!)
+	scanf("%s", ande[1]);
+
+	while (duru[len_duru]) len_duru++;
+
+	/*while (angel[len_bridge]) len_bridge++;*/
+	while (ande[0][len_bridge]) len_bridge++;
+}
+
+void DFS(int L, int idx, int ad)
+{
+	int i, end;
+
+	if (L >= len_duru)
+	{
+		cnt++;
+		return;
+	}
+
+	//for (i = idx; i < len_bridge; i++)
+	end = len_bridge - len_duru + L;
+	for (i = idx; i <= end; i++)
+	{
+		//if (ad == 1)
+		//{
+		//	if (angel[i] != duru[L]) continue;
+		//	DFS(L + 1, i + 1, -ad);
+		//}
+		//else
+		//{
+		//	if (devil[i] != duru[L]) continue;
+		//	DFS(L + 1, i + 1, -ad);
+		//}
+		if (ande[ad][i] != duru[L]) continue;
+		DFS(L + 1, i + 1, !ad);
+		//DFS(L + 1, i + 1, ad ^ 1);	=>	비트연산자로도 가능!!! 1이었다면 0으로, 0이었다면 1로(같으면 0, 다르면 1)
+	}
+}
+
+void Print(void)
+{
+	//printf("len_duru = %d, len_bridge = %d\n", len_duru, len_bridge);
+	printf("%d\n", cnt);
+}
+#endif
+
+
+
+
+
+
+// ★★★문제 C1: [TST]건물세우기(BASIC2)★★★
+#if 0
+#include <stdio.h>
+#define MAX     (15)
+
+void Input(void);
+void DFS(int L, int sum);
+void Print(void);
+
+int n;                         // 빌딩의 개수 : 1 ~ 10
+int Cost[MAX][MAX];            // 빌딩의 비용 입력
+//int Cost_Mix[MAX];             // 건물 비용 조합
+int Place_Check[MAX];
+int Min;
+//int cnt;
+int Best[MAX];
+
+int main(void)
+{
+	Input();
+	DFS(1, 0);
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i, j;
+
+	Min = 10000;
+	scanf("%d", &n);
+	for (i = 1; i <= n; i++)
+	{
+		for (j = 1; j <= n; j++)
+		{
+			scanf("%d", &Cost[i][j]);
+		}
+	}
+}
+
+void DFS(int L, int sum)
+{
+	int i;
+
+	if (sum >= Min) return;			// 좋은 가지치기!!
+	if (L > n)
+	{
+		//for (i = 1; i <= n; i++)
+		//{
+		//	printf("%d ", Best[i]);
+		//}
+		//printf("\n");
+		//printf("%d : sum = %d\n", ++cnt, sum);
+		if (Min > sum) Min = sum;
+		//printf("%d : Min = %d\n", cnt, Min);
+		return;
+	}
+
+	for (i = 1; i <= n; i++)
+	{
+		if ( Place_Check[i] ) continue;
+		Place_Check[i] = 1;				// ★★i번째 장소에 건물 L 을 지음!!!★★
+		//Cost_Mix[L] = Cost[L][i];
+		Best[L] = i;
+
+		DFS(L + 1, sum + Cost[L][i]);
+
+		Place_Check[i] = 0;
+		//Cost_Mix[L] = 0;
+		Best[L] = 0;
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", Min);
+}
+#endif
+
+
+// ★★문제 A1: [TEST] 쥐와고양이★
+#if 0
+#include <stdio.h>
+#define MAX     (15)
+#define ABS(x1, x2)     ( ((x) < 0) ? -(x) : (x) )
+
+typedef struct _st
+{
+	int y;
+	int x;
+}OBJECT;
+OBJECT seed[8];
+OBJECT cat;
+OBJECT mouse;
+
+void Input(void);
+void Move_Mouse(int sn);
+void Move_Cat(void);
+void GAME(void);
+void Print(void);
+
+int N;
+int flag;
+int mcflag;
+int mrflag;
+int ccflag;
+int crflag;
+int seed_num;
+int dy[3] = { 0, 1, -1 };
+int dx[3] = { 0, 1, -1 };
+int mcnt;
+int ccnt;
+
+int main(void)
+{
+	Input();
+	GAME();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d %d", &(seed[i].x), &(seed[i].y));
+	}
+	seed[i].x = 0;
+	seed[i].y = 1;
+	scanf("%d %d", &(cat.x), &(cat.y));
+	mouse.x = seed[1].x;
+	mouse.y = seed[1].y;
+	flag = 0;
+	seed_num = 2;
+}
+
+void Move_Mouse(int sn)
+{
+	if (seed[sn].x == mouse.x)
+	{
+		mcflag = 0;
+		if (seed[sn].y == mouse.y) mrflag = 0;
+		else if (seed[sn].y > mouse.y) mrflag = 1;
+		else if (seed[sn].y < mouse.y) mrflag = 2;
+
+		mouse.y += dy[mrflag];
+	}
+	else if (seed[sn].x > mouse.x) mcflag = 1;
+	else if (seed[sn].x < mouse.x) mcflag = 2;
+	mouse.x += dx[mcflag];
+
+	//printf("[%d] mouse.x = %d, mouse.y = %d\n", ++mcnt, mouse.x, mouse.y);
+}
+
+void Move_Cat(void)
+{
+	if (mouse.y == cat.y)
+	{
+		crflag = 0;
+		if (mouse.x == cat.x) ccflag = 0;
+		else if (mouse.x > cat.x) ccflag = 1;
+		else if (mouse.x < cat.x) ccflag = 2;
+
+		cat.x += dy[ccflag];
+		if (mouse.x != cat.x) cat.x += dy[ccflag];
+	}
+	else if (mouse.y > cat.y) crflag = 1;
+	else if (mouse.y < cat.y) crflag = 2;
+
+	cat.y += dy[crflag];
+	if (mouse.y != cat.y) cat.y += dy[crflag];
+
+	//printf("[%d] cat.x = %d, cat.y = %d\n", ++ccnt, cat.x, cat.y);
+}
+
+void GAME(void)
+{
+	if (flag) return;
+	for (;;)
+	{
+		Move_Cat();
+		if (cat.x == mouse.x && cat.y == mouse.y) break;
+		if (cat.x == 1 && cat.y == 1) break;
+
+		Move_Mouse(seed_num);
+		if (mouse.x == seed[seed_num].x && mouse.y == seed[seed_num].y)
+		{
+			if (seed_num == N + 1)
+			{
+				flag = 1;
+				break;
+			}
+			seed_num++;
+			mrflag = 0;
+			mcflag = 0;
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", flag);
+}
+#endif
+
+// 순열!!
+// 문제 B8: [TST] 구슬 고르기3
+#if 0
+
+#include <stdio.h>
+
+void DFS(int n);
+void Print(int d);
+
+int ARR[3] = { 2, 5, 7 };	// 구슬
+int BASKET[3];				// 구슬 담을 상자
+int chk[3];					// 체크 배열
+int N = 3;					// 구슬 3개
+int L_cnt;
+
+int main(void)
+{
+	DFS(0);					// 0번 요소, 즉 ARR[0]에서부터 시작!!
+
+	return 0;
+}
+
+
+void DFS(int d)
+{
+	int i;
+
+	//1] 리턴조건 : 3개를 고른후 인쇄후 리턴
+	if (d == N)
+	{
+		Print(d);
+		return;
+	}
+
+	//2] a배열에서 0부터 N전까지 고르는 모든 경우(단 구슬의 중복을 배제)
+	for (i = 0; i < N; i++)
+	{
+		if (chk[i]) continue;
+		chk[i] = 1;		// ★
+		BASKET[d] = ARR[i];
+
+		DFS(d + 1);
+
+		chk[i] = 0;		// ★
+		BASKET[d] = 0;
+	}
+}
+
+void Print(int d)
+{
+	int i;
+
+	//printf("%2d : ", ++L_cnt);
+	for (i = 0; i < d; i++)
+	{
+		printf("%d ", BASKET[i]);
+	}
+	printf("\n");
+}
+#endif
+
+// 문제 B7: [TST] 구슬 고르기2
+#if 0
+#include <stdio.h>
+
+void DFS(int cnt, int s_idx);
+void Print(void);
+
+int ARR[6] = { 0, 1, 3, 4, 7, 9 };
+int List[6];
+int N = 5;		// 5개 중
+int pick = 2;	// 2개 고름(조합)
+int L_cnt;		// 디버그용
+
+int main(void)
+{
+	DFS(1, 1);    // List[1]번에 담기 시작, ARR[1]번 구슬부터 조합
+
+	return 0;
+}
+
+void DFS(int d, int s_idx)  // d는 가지, s_idx는 구슬 시작 요소
+{
+	int i;
+
+
+
+	//1] 리턴조건 : 2개째 고른후 인쇄후 리턴 (d가 +1이 되어 2개째 호출 되면 끝)
+	if (d > pick)
+	{
+		Print();
+		return;
+	}
+
+	//2] 리턴조건 : s_idx(요소 번호)가 N(5)보다 크면 리턴
+	if (s_idx > N)	return;
+
+	//3] ARR배열에서 1부터 N(5)까지 고르는 모든 경우
+	for (i = s_idx; i <= N - pick + d; i++)
+	{
+		List[d] = ARR[i];
+		DFS(d + 1, i + 1);
+	}
+}
+
+void Print(void)
+{
+	int i;
+
+	//printf("%2d : ", ++L_cnt);
+	for (i = 1; i <= pick; i++)
+	{
+		printf("%d ", List[i]);
+	}
+	printf("\n");
+}
+#endif
+
+/*
+자연수들을 주고, 그 중에 몇 개의 수를 골라서 그 합이 K가 될 수 있는지 알아보라고 시켰다.
+철수 어머니가 자연수들을 무작위로 선택해서 본인도 가능한지 아닌지 모르고 있다.
+=> 몇 개 뽑는지 모름~!
+*/
+// 문제 B9: [TST] 더하기
+#if 0
+#include <stdio.h>
+#define MAX	(100001)
+
+void Input(void);
+void Init(void);
+void DFS(int d, int Sum);
+void Print(void);
+void Print_DB(int d, int sum);
+
+int T;
+int N;			// 5 ~ 20
+int K;			// 1 ~ 2000000
+int di[MAX];
+int List[MAX];	// 필요 없음!!!	=>	디버깅용!!!
+int Sum;
+int Check_Sum[MAX];
+int flag;
+
+int cnt;
+
+int main(void)
+{
+	int i;
+
+	freopen("in_B9.txt", "r", stdin);
+	scanf("%d", &T);
+	for (i = 1; i <= T; i++)
+	{
+		Input();
+		//if (Check_Sum[1] < K)
+		//{
+		//	Print();
+		//	continue;
+		//}				=> 이런 조건들도 DFS 함수 안에서 바로 빠져나올 수 있도록 설게!!
+		DFS(1, Sum);
+		Print();
+		Init();
+	}
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d %d", &N, &K);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &di[i]);
+	}
+
+	Check_Sum[N] = di[N];
+	for (i = N - 1; i >= 1; i--)
+	{
+		Check_Sum[i] = Check_Sum[i + 1] + di[i];
+	}
+}
+
+void Init(void)
+{
+	int i;
+
+	flag = 0;
+	Sum = 0;
+	for (i = 1; i <= N; i++)
+	{
+		di[i] = List[i] = Check_Sum[i] = 0;
+	}
+}
+
+void DFS(int d, int sum)
+{
+	//if (d > N)
+	//{
+	//		if (sum == K) flag = 1;
+	//		return;
+	//}						// => 이런 식으로 리턴값을 주기도 함!! 5번 찰 때마다 검사
+	//	  매번 같은 지 안 물어봐도 되는 장점. 하지만 따로 빼면 답을 더 빨리 찾을 수도.
+	//    테스트 케이스마다 다르다!
+	Print_DB(d, sum);
+	if (sum == K)
+	{
+		flag = 1;
+		return;
+	}
+	if (flag || (d > N) || (Check_Sum[d] < K - sum) || (sum > K)) return;
+	//=> return은 함수를 완전 끝내는 것이 아니라, 한 겹 나가는 것. 계속 리턴으로 빠져나가자!!
+
+	List[d] = 0;
+	DFS(d + 1, sum);
+
+	List[d] = di[d];
+	DFS(d + 1, sum + di[d]);
+}
+
+void Print(void)
+{
+	printf("%s\n", (flag) ? "YES" : "NO");
+}
+
+void Print_DB(int d, int sum)
+{
+	int i;
+
+	printf("%2d (%2d ) : ", ++cnt, sum);
+	for (i = 1; i <= N; i++)
+	{
+		printf("%2d ", List[i]);
+	}
+	printf("\n");
+}
+#endif
+
+// 문제 B6: [TST] 구슬 고르기1
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void DFS(int d);
+void Operation(void);
+void Print(void);
+
+int ARR[3] = { 2, 5, 7 };
+int List[3];
+int N = 3;
+
+int main(void)
+{
+	DFS(0);
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void DFS(int d)
+{
+	if (d > N - 1)	// d는 배열의 요소 번호이므로!!!
+	{
+		Print();
+		return;
+	}
+
+	List[d] = ARR[d];
+	DFS(d + 1);
+
+	List[d] = 0;
+	DFS(d + 1);
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+	int i;
+
+	for (i = 0; i < N; i++)
+	{
+		printf("%d ", List[i]);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+
+
+// ★★★문제 C2: [TST] 책꽂이	=> 잘못 품!! (지금 푼 방식은 순열인데, 이 문제는 조합임!! => 수정함)★★
+#if 0
+#include <stdio.h>
+#define MAX	(25)
+
+void Input(void);
+void DFS(int d, int idx, int s);
+void Print(void);
+void Init(void);
+
+int T;
+int N;
+int B;
+int H_i[MAX];
+int Min;
+//int chk[MAX];
+int chk_sum[MAX];
+int List[MAX];
+
+int main(void)
+{
+	int i;
+
+	//freopen("in.txt", "r", stdin);
+	scanf("%d", &T);
+	for (i = 1; i <= T; i++)
+	{
+		Input();
+		DFS(1, 1, 0);
+		Print();
+		Init();
+	}
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	Min = 0x7fffffff;
+	scanf("%d %d", &N, &B);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &H_i[i]);
+	}
+
+	chk_sum[N] = H_i[N];
+	for (i = N - 1; i >= 1; i--)
+	{
+		chk_sum[i] = chk_sum[i + 1] + H_i[i];
+	}
+}
+
+void DFS(int d, int idx, int s)
+{
+	//int i;
+	int comp;
+
+	if (s >= B)
+	{
+		//for (i = 1; i <= d; i++)
+		//{
+		//	printf("%d ", List[i]);
+		//}
+		comp = s - B;
+		if (Min > comp) Min = comp;
+		return;
+	}
+	if ( (d > N) || (chk_sum[idx] + s < B) ) return;
+
+	//for (i = idx; i <= N; i++)
+	//{
+	//	if ( chk[i] ) continue;
+	//	chk[i] = 1;
+	//	//List[i] = H_i[i];
+	//	DFS(d + 1, i + 1, s + H_i[i]);
+	//	chk[i] = 0;
+	//	//List[i] = 0;
+	//}
+	List[d] = H_i[d];
+	DFS(d + 1, idx, s + H_i[d]);
+
+	List[d] = 0;
+	DFS(d + 1, idx, s);
+}
+
+void Print(void)
+{
+	printf("%d\n", Min);
+}
+
+void Init(void)
+{
+	int i;
+
+	for (i = 1; i <= N; i++)
+	{
+		H_i[i] = 0;
+		//chk[i] = 0;
+		chk_sum[i] = 0;
+		//List[i] = 0;
+	}
+}
+
+// 명서님 ver.
+//void DFS(int depth, int sum)
+//{
+//	int i;
+//
+//	//if (sum >= min) return;
+//
+//	if (depth > N)
+//	{
+//		if (sum >= B)
+//		{
+//			if (sum < min) min = sum;
+//		}
+//		return;
+//	}
+//
+//	b[depth] = a[depth];
+//	DFS(depth + 1, sum + a[depth]);
+//	b[depth] = 0;
+//	DFS(depth + 1, sum);
+//}
+#endif
+
+
+
+
+
+
+
+// ★★★문제 C3: [TST] 농장 탈출★★★
+#if 0
+#include <stdio.h>
+#define MAX	(25)
+
+void Input(void);
+void DFS(int L, int cnt, int sum);
+int Check_Carry(int A, int B);
+void Print(void);
+
+int N;
+int W_n[MAX];
+int Max;
+int List[MAX];
+//int ccnt;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	DFS(1, 0, 0);
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	Max = 0;
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &W_n[i]);
+	}
+}
+
+int Check_Carry(int A, int B)
+{
+	//int c1, c2;
+
+	//while (A != 0 && B != 0)
+	while ( A && B )
+	{
+		//c1 = A % 10;
+		//c2 = B % 10;
+
+		if (A % 10 + B % 10 >= 10) return 0;
+
+		A /= 10;
+		B /= 10;
+	}
+	return 1;
+}
+
+void DFS(int L, int cnt, int sum)
+{
+	//int i;
+
+	if ( (N - L + 1) + cnt <= Max ) return;
+	if (L > N)
+	{
+		//printf("[%d]\n", ++ccnt);
+		//for (i = 1; i < L; i++)
+		//{
+		//	printf("%d ", List[i]);
+		//}
+		//printf("%d ", cnt);
+		//printf("\n");
+
+		if (cnt > Max) Max = cnt;
+		return;
+	}
+
+	if ( Check_Carry( sum, W_n[L] ) )
+	{
+		//List[L] = W_n[L];
+		DFS(L + 1, cnt + 1, sum + W_n[L]);
+	}
+
+	//List[L] = 0;
+	DFS(L + 1, cnt, sum);
+}
+
+void Print(void)
+{
+	printf("%d\n", Max);
+}
+#endif
+
+
+
+
+// 문제 C5: [TST]자동차경주대회(BASIC2)
+#if 0
+#include <stdio.h>
+#define MAX	(55)
+
+void Input(void);
+void DFS(int L, int D, int sumtime);
+void Print(void);
+
+int Km;
+int N;
+int dist[MAX];
+int dist_sum[MAX];
+int time[MAX];
+int Min;
+int cnt;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	DFS(1, dist[1], 0);
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	Min = 0x7fffffff;
+	scanf("%d", &Km);
+	scanf("%d", &N);
+	dist_sum[0] = 0;
+	for (i = 1; i <= N + 1; i++)
+	{
+		scanf("%d", &dist[i]);
+		dist_sum[i] = dist_sum[i - 1] + dist[i];
+	}
+
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &time[i]);
+	}
+}
+
+// L : Level, D : 정비 X distance, sumtime : 시간 합
+void DFS(int L, int D, int sumtime)
+{
+	//int i;
+
+	if (D > Km) return;
+	if (sumtime >= Min) return;
+	if (L >= N + 1)
+	{
+		//printf("[%d] sumtime = %d\n", ++cnt, sumtime);
+		if (Min > sumtime) Min = sumtime;
+		//printf("Min = %d\n", Min);
+		return;
+	}
+
+	// [ 시도 1]
+	//if ( D + dist[L + 1] >= Km )
+	//{
+	//	printf("L = %d\n", L);
+	//	DFS(L + 1, dist[L + 1], sumtime + time[L]);
+	//}	// 다음 거리까지 더해서 Km가 넘지 않더라도 들를 수 있도록 해줘야해..!!!(근데 조건을 어떻게 하지...)
+	// DFS(L + 1, D + dist[L + 1], sumtime);
+
+	// 헤맸던 부분!!
+	// 다음 정비소까지의 거리가 140Km가 넘으면 무조건 들러야 함!!
+	// ★ 하지만 140Km가 넘지 않더라도 미리 받을 수 있잖아? 정비 시간이 훨씬 적게 든다면 더욱 좋은 케이스일듯!!
+
+
+
+	// [ 시도 2 ]
+	//for (i = L + 1; i <= N + 1; i++)
+	//{
+	//	if (dist_sum[i] - dist_sum[L] <= Km)
+	//	{
+	//		DFS(L + 1, dist[L + 1], sumtime + time[L]);
+	//	}
+	//}
+	//DFS(L + 1, D + dist[L + 1], sumtime);
+	// 이 풀이 런타임 에러 났음.;;;;
+
+
+
+
+	// [ 시도 3 ]	=> 얘는 어차피 재귀 조건이 크게 O / X니까 조금 돌아가는 느낌!!
+	DFS(L + 1, dist[L + 1], sumtime + time[L]);
+	DFS(L + 1, D + dist[L + 1], sumtime);
+// => 쉽게 생각하면, 원래 "이럴 때 정비를 받아야 한다!!" 라는 조건이 쓰여야 할 것이라고 생각했고, 그럼 좋겠지만,
+//	   그러한 조건들을 위의 리턴 조건에서, 그리고 main에서 기존과 다르게 가공해서 적어준 거라고 생각하자!
+
+
+
+
+	// [ 시도 4 ] : 내가 원래 하려고 했던 코드!!!!	=> 얘가 더 좋아보임!! 조건을 줘서 이럴 때 저럴 때 나눠주니까
+	if (D < Km)
+	{
+		DFS(L + 1, D + dist[L + 1], sumtime);
+	}
+	DFS(L + 1, dist[L + 1], sumtime + time[L]);
+// => 일단 140Km보다 덜 갔으면 안 들러도 됨!!
+//	  ★★하지만 언제든지 들를 수 있으니까 정비소에 들르는 경우를 조금 더 자유롭게 조건 안 주고 밖에 쓰면 좋겠지!!
+}
+
+void Print(void)
+{
+	printf("%d\n", Min);
+}
+#endif
+
+// ★★★★★★★★★
+// 광은님 ver.	=> 나는 더해가면서 입력받은 최대 거리까지 가는 컨셉.
+//			    => 광은님은 입력받은 최대 거리를 잔여 Resource로 봐주어 다음 거리보다 작으면 무조건 정비를 받게끔!!
+//					아니면, Resource가 다음 거리보다 크면 정비를 받든 말든 마음대로!
+//#include <stdio.h>
+//
+//int K, N;
+//int Dist[55];
+//int Time[55];
+//int List[55];
+//int Min;
+//
+//void Input(void);
+//void DFS(int L, int R, int S);
+//
+//int main(void)
+//{
+//	Input();
+//	Min = 0x7FFF0000;
+//	DFS(1, K - Dist[0], 0);
+//	printf("%d\n", Min);
+//
+//	return 0;
+//}
+//
+//void Input(void)
+//{
+//	int i;
+//
+//	scanf("%d %d", &K, &N);
+//	for (i = 0; i <= N; i++)
+//	{
+//		scanf("%d", &Dist[i]);
+//	}
+//	for (i = 1; i <= N; i++)
+//	{
+//		scanf("%d", &Time[i]);
+//	}
+//}
+//// L : level, R : resource, S : timesum
+//// Dist는 그 정비소에서 다음 정비소까지의 거리
+//// 다음 정비소로 갈 때 무조건 빼줘야함
+//void DFS(int L, int R, int S)
+//{
+//	if (S >= Min) return;
+//	if (L > N)
+//	{
+//		if (S < Min) Min = S;
+//		return;
+//	}
+//	// 정비를 받지 않고 갈 수 있는가?
+//	// YES : 정비를 받지 않고 간다, 정비를 받고 간다
+//	// NO : 정비를 받고 간다
+//	if (R >= Dist[L])
+//	{
+//		DFS(L + 1, R - Dist[L], S);
+//	}
+//	DFS(L + 1, K - Dist[L], S + Time[L]);
+//}
+
+
+
+
+
+// 문제 C6: [TST]양팔저울(BASIC)
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Print(void);
+
+int main(void)
+{
+	//freopen("in.txt", "r", stdin);
+	Input();
+
+	Print();
+
+	return 0;
+}
+#endif
+
+
+
+
+// 윤규형 ver.로 풀어보기
+// 문제 C7: [TEST] 도자기
+#if 0
+#include <stdio.h>
+#define MAX		(30)
+
+void Input(void);
+void DFS(int L, int idx);
+void Print(void);
+void Print_List(int L);
+void Init(void);
+
+int T;
+int N;
+int M;
+int Resource[MAX];
+int List[MAX];
+int cnt;
+
+int main(void)
+{
+	int i;
+
+	freopen("in.txt", "r", stdin);
+
+	scanf("%d", &T);
+
+	//for (i = 1; i <= T; i++)
+	while (T--)
+	{
+		Input();
+		DFS(1, 1);
+		Print();
+		Init();
+	}
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, tmp;
+	
+	cnt = 0;
+	scanf("%d %d", &N, &M);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &tmp);
+		Resource[tmp]++;
+	}
+}
+
+void DFS(int L, int idx)
+{
+	int i;
+
+	if (L > M)
+	{
+		cnt++;
+		//Print_List(L);
+		return;
+	}
+
+	for (i = idx; i <= 26; i++)
+	{
+		if ( Resource[i] == 0 ) continue;
+
+		Resource[i]--;
+		List[L] = i;
+
+		DFS(L + 1, i);	// 아직 남아있으면 다시 사용할 수 있기 때문에 i + 1이 아니라 i를 넘겨준 것!
+
+		List[L] = 0;
+		Resource[i]++;
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", cnt);
+}
+
+//void Print_List(int L)
+//{
+//	int i;
+//
+//	for (i = 1; i < L; i++)
+//	{
+//		printf("%d ", List[i]);
+//	}
+//	printf("\n");
+//}
+
+void Init(void)
+{
+	int i;
+
+	for (i = 0; i <= 26; i++)
+	{
+		Resource[i] = 0;
+		List[i] = 0;
+	}
+}
+#endif
+
+
+
+
+
+// 문제 C7: [TEST] 도자기
+#if 0
+#include <stdio.h>
+#define MAX		(15)
+
+void Input(void);
+void Sort(void);
+void DFS(int L, int idx);
+void Print(void);
+void Print_List(int L);
+void Init(void);
+
+int T;
+int N;
+int M;
+int Resource[MAX];
+//int check[MAX];
+int List[MAX];
+int scnt;
+
+int cnt;
+
+int main(void)
+{
+	int i;
+
+	freopen("in.txt", "r", stdin);
+
+	scanf("%d", &T);
+	for (i = 1; i <= T; i++)
+	{
+		Input();
+		Sort();
+		DFS(1, 1);
+		Print();
+		Init();
+	}
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, tmp;
+
+	cnt = 0;
+	scanf("%d %d", &N, &M);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &Resource[i]);
+	}
+}
+
+void Sort(void)
+{
+	int i, j, tmp;
+
+	for (i = 1; i <= N - 1; i++)
+	{
+		for (j = i + 1; j <= N; j++)
+		{
+			if (Resource[i] > Resource[j])
+			{
+				tmp = Resource[j];
+				Resource[j] = Resource[i];
+				Resource[i] = tmp;
+			}
+		}
+	}
+}
+
+void DFS(int L, int idx)
+{
+	int i;
+	int prev = -1;
+
+	if (L > M)
+	{
+		cnt++;
+		//Print_List(L);
+		return;
+	}
+
+	for (i = idx; i <= N; i++)
+	{
+		if (prev == Resource[i]) continue;
+		List[L] = Resource[i];
+		prev = Resource[i];
+
+		DFS(L + 1, i + 1);
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", cnt);
+}
+
+//void Print_List(int L)
+//{
+//	int i;
+//
+//	for (i = 1; i < L; i++)
+//	{
+//		printf("%d ", List[i]);
+//	}
+//	printf("\n");
+//}
+
+void Init(void)
+{
+	int i;
+
+	for (i = 0; i <= N; i++)
+	{
+		Resource[i] = 0;
+		List[i] = 0;
+	}
+}
+#endif
