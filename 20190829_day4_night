@@ -1,0 +1,286 @@
+// 제출하자!!
+// 문제 C2: [TST]건물세우기(BASIC)-SPJ
+#if 0
+#include <stdio.h>
+#define MAX     (15)
+
+typedef struct _st
+{
+     int Min_Cost;
+     int Min_Place[MAX];
+}MIN;
+MIN result;
+
+void Input(void);
+void DFS(int L, int sum);
+void Copy_Arr(int *p, int L);
+void Print(void);
+void Print_Place(void);
+
+int n;                  // 빌딩의 개수 (1 ~ 10)
+int Cost[MAX][MAX];
+int Check[MAX];
+int Place[MAX];
+
+int main(void)
+{
+        Input();
+        DFS(1, 0);
+        Print();
+        Print_Place();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+        int i, j;
+
+        result.Min_Cost = 987654321;
+        scanf("%d", &n);
+        for(i = 1; i <= n; i++)
+        {
+                for(j = 1; j <= n; j++)
+                {
+                        scanf("%d", &Cost[i][j]);
+                }
+        }
+}
+
+void DFS(int L, int sum)
+{
+        int i, j;
+
+        if(sum >= result.Min_Cost) return;
+        if(L > n)
+        {
+                if(result.Min_Cost > sum)
+                {
+                        result.Min_Cost = sum;
+                        Copy_Arr(Place, L);
+                }
+                return;
+        }
+
+        for(i = 1; i <= n; i++)
+        {
+                if( Check[i] ) continue;
+                Check[i] = 1;
+                Place[L] = i;
+
+                DFS(L + 1, sum + Cost[L][i]);
+
+                Check[i] = 0;
+                Place[L] = 0;
+        }
+}
+
+void Print(void)
+{
+        printf("%d\n", result.Min_Cost);
+}
+
+void Copy_Arr(int *p, int L)
+{
+        int i;
+
+        for(i = 1; i < L; i++)
+        {
+                result.Min_Place[i] = p[i];
+        }
+}
+
+void Print_Place(void)
+{
+        int i;
+
+        for(i = 1; i <= n; i++)
+        {
+                printf("%d ", result.Min_Place[i]);
+        }
+        printf("\n");
+}
+#endif
+
+
+
+
+// 문제 C6: [TST]양팔저울(BASIC)
+#if 0
+#include <stdio.h>
+#define NAX     (15)
+#define MAX     (10)
+void Input(void);
+void DFS(int L, int result, int order);
+void Print(void);
+
+int n;
+int choo[NAX];
+int List[NAX];
+int check_sum[NAX];
+int m;
+int Gi[MAX];
+char print[3] = {'N', 'Y', '\0'};
+int flag[MAX];
+
+int main(void)
+{
+        int i;
+
+        Input();
+        for(i = 1; i <= m; i++)
+        {
+               DFS(1, check_sum[1], i);
+        }
+        Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+        int i;
+
+        scanf("%d", &n);
+        for(i = 1; i <= n; i++)
+        {
+                scanf("%d", &choo[i]);
+        }
+
+        check_sum[n] = choo[n];
+        for(i = n - 1; i >= 1; i--)
+        {
+                check_sum[i] = check_sum[i + 1] + choo[i];
+        }
+
+        scanf("%d", &m);
+        for(i = 1; i <= m; i++)
+        {
+                scanf("%d", &Gi[i]);
+        }
+}
+
+void DFS(int L, int result, int order)
+{
+        //int i;
+        //for(i = n; i >= 1; i--)
+        //{
+        //        printf("[]  %d ", result);
+        //}
+        //printf("\n");
+        if(Gi[order] == result)
+        {
+                flag[order] = 1;
+                return;
+        }
+        if(L > n || result < Gi[order] || result < 0) return;
+        // result - check_sum[L] > Gi[order] ||
+        List[L] = 2* choo[L];
+        DFS(L + 1, result - 2 * choo[L], order);
+
+        List[L] = choo[L];
+        DFS(L + 1, result - choo[L], order);
+
+        List[L] = 0;
+        DFS(L + 1, result, order);
+}
+
+void Print(void)
+{
+        int i;
+
+        for(i = 1; i <= m; i++)
+        {
+                printf("%c ", print[flag[i]]);
+                //printf("%d", flag[i]);
+                //printf("\n");
+        }
+}
+#endif
+
+
+
+
+// 문제 C8: [TST]귀가
+#if 01
+#include <stdio.h>
+#define ALPHABET        (60)
+
+void Input(void);
+void DFS(int L, int distance, int se);
+void Print(void);
+
+int P;
+int cow_house[ALPHABET][ALPHABET];
+int Time[ALPHABET];
+int check[ALPHABET];
+int Min;
+int cow;
+
+int main(void)
+{
+        Input();
+        DFS(1, 0, 53);
+        Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+        int i, num;
+        char a1, a2;
+
+        Min = 987654321;
+        scanf("%d", &P);
+        for(i = 1; i <= P; i++)
+        {
+                scanf("%c %c", &a1, &a2);
+                fflush(stdin);
+                scanf("%d", &num);
+                fflush(stdin);
+                if(a1 <= 'z') a1 -= 'a' + 1;
+                else a1 -= 'A' + 27;
+
+                if(a2 <= 'z') a2 -= 'a' + 1;
+                else a2 -= 'A' + 27;
+
+                cow_house[a1][a2] = cow_house[a2][a1] = num;
+        }
+}
+
+void DFS(int L, int distance, int se)
+{
+        int i;
+
+        if(se < 53 && se >= 27)
+        {
+                if(Min > distance)
+                {
+                        cow = se;
+                        Min = distance;
+                }
+                return;
+        }
+        if(L >= 53) return;
+
+        for(i = 52; i >= 1; i--)
+        {
+                if( check[i] ) continue;
+                check[i] = 1;
+                Time[L] = cow_house[i][se];
+                DFS(L + 1, distance + cow_house[i][se], i);
+                check[i] = 0;
+                Time[L] = 0;
+        }
+
+}
+
+void Print(void)
+{
+        printf("%c %d\n", cow + 'A' - 27, Min);
+}
+#endif
