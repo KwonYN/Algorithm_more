@@ -1,0 +1,617 @@
+// 20190830 금요일!!
+
+// 문제 C9: [TST]퍼킷
+#if 0
+#include <stdio.h>
+#define MAX	(15)
+#define SUB_ABS(x)	( ((x) < 0) ? -(x) : (x) )
+
+void Input(void);
+void DFS(int L, int Shin, int Sseun);
+void Print(void);
+void Print_List(int L);
+
+int N;
+int Shin_Sseun[MAX][2];
+int List[MAX];
+int Min;
+int flag;
+int cnt;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	DFS(1, 1, 0);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	flag = 0;
+	Min = 987654321;
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d %d", &Shin_Sseun[i][0], &Shin_Sseun[i][1]);
+	}
+}
+
+void DFS(int L, int Shin, int Sseun)
+{
+	int check;
+
+	printf("[%d] L = %d, Shin = %d, Sseun = %d\n", ++cnt, L, Shin, Sseun);
+
+	//if ( flag ) return;
+	//if (check == 0)
+	//{
+	//	flag = 1;
+	//	Min = 0;
+	//	Print_List(L);
+	//	return;
+	//}
+	if (L > N)
+	{	// 조건 주고 이런 경우 못 하도록!! (다 빼주는 경우는 없어야 하므로!!)
+		if (Shin == 1 && Sseun == 0) return;
+
+		check = SUB_ABS(Shin - Sseun);
+		if (check < Min)
+		{
+			Min = check;
+			Print_List(L);
+		}
+		return;
+	}
+
+	List[L] = SUB_ABS(Shin * Shin_Sseun[L][0] - (Sseun + Shin_Sseun[L][1]));
+	DFS(L + 1, Shin * Shin_Sseun[L][0], Sseun + Shin_Sseun[L][1]);
+
+	List[L] = check;
+	DFS(L + 1, Shin, Sseun);
+}
+
+void Print(void)
+{
+	printf("%d\n", Min);
+}
+
+void Print_List(int L)
+{
+	int i;
+
+	for (i = 1; i < L; i++)
+	{
+		printf("%d ", List[i]);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+// ★★★ 가장 첫 값, 마지막 값 포함 여부!! // 중복 여부 // 정렬 등... ★★★
+// 문제 D0: [TST]해밀턴 순환회로
+#if 0
+#include <stdio.h>
+#define MAX	(15)
+
+void Input(void);
+void DFS(int L, int cost, int s);
+void Print(void);
+void Print_Cost(void);
+
+int N;
+int Cost[MAX][MAX];
+int chk[MAX];
+int Cost_List[MAX];
+int Place_List[MAX];
+int Min_Cost;
+int cnt;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	DFS(1, 0, 1);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+
+	Min_Cost = 987654321;
+	//chk[1] = 1;
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			scanf("%d", &Cost[i][j]);
+		}
+	}
+}
+
+// L : Level(모든 시험장을 방문해야 하므로 L이 5가 되어야 1로 돌아갈 수 있음!)
+// cost : 방문하기까지의 총 비용
+// s : 전 단계 기준으로는 도착한 곳, 현 단계 기준으로는 출발해야 할 곳
+void DFS(int L, int cost, int s)
+{
+	int i;
+
+	//printf("[%d] L = %d, cost = %d, s = %d\n", ++cnt, L, cost, s);
+
+	// 이미 최소 비용 넘는 경로이므로 배제
+	if (cost >= Min_Cost) return;
+
+	// L == 5(N)는 1 ~ 5시험장 다 찍었다는 의미이므로 1로 돌아갈 수 있는 경로 있는지 확인 후 비용 비교
+	if (L >= N)
+	{
+		if (Cost[s][1] == 0) return;
+
+		Cost_List[L] = Cost[s][1];
+		cost += Cost[s][1];
+		if (Min_Cost > cost)
+		{
+			Min_Cost = cost;
+			//printf("cost = %d\n", cost);
+			Print_Cost();
+		}
+		return;
+	}
+
+	// 1은 스타트와 라스트라는 것을 알고 있으므로 그 사이의 경로만 구해주면 됨!!
+	for (i = 2; i <= N; i++)
+	{	
+		// 이곳(s)에서는 i 시험장으로 갈 수 없음 or 이미 i 시험장 갔으므로 갈 수 없음
+		if ( Cost[s][i] == 0 || chk[i] ) continue;
+		chk[i] = 1;
+		Cost_List[L] = Cost[s][i];
+		Place_List[L] = i;				// s에서 i 시험장으로 갔다!!(처음, 마지막은 무조건 1 !!)
+
+		DFS(L + 1, cost + Cost[s][i], i);
+
+		Place_List[L] = 0;
+		Cost_List[L] = 0;
+		chk[i] = 0;
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", Min_Cost);
+}
+
+void Print_Cost(void)
+{
+	int i;
+
+	// 1->a, a->b, b->c, c->d, d->1... 이렇게 5가지 비용
+	printf("[비 용]  1->a, a->b, b->c, c->d, d->1\n");
+	for (i = 1; i <= N; i++)
+	{
+		printf("%d ", Cost_List[i]);
+	}
+	printf("\n");
+
+	// 1을 제외하고 a, b, c, d 장소!
+	printf("[장 소]  1->a, a->b, b->c, c->d, d->1 장소 a, b, c, d\n");
+	for (i = 1; i < N; i++)
+	{
+		printf("%d ", Place_List[i]);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+
+
+/*
+[IDEA]
+우유 가격 추이를 보고 최고 쌀 때 삼.
+*/
+// 문제 D1: [TST]요플레 공장
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Print(void);
+
+int main(void)
+{
+	Input();
+	Print();
+	return 0;
+}
+
+void Input(void)
+{
+
+}
+
+void Print(void)
+{
+
+}
+#endif
+
+
+
+
+
+// ★★문제 D2: [TST]보너스★★	=>	★★★순열문제★★★
+#if 0
+#include <stdio.h>
+#define MAX		(110)
+#define NUMOPEO	(12)
+
+void Input(void);
+void DFS(int L);
+int Pride_Check(int L, int i);
+void Print(void);
+
+int N;
+int M;
+int Rel[NUMOPEO][NUMOPEO];
+int bonus[NUMOPEO];
+int Bonus_List[NUMOPEO];
+int chk[NUMOPEO];
+int flag;
+int cnt;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	DFS(2);
+	//Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+	int s, e;
+	int Max_idx;
+	int tmp;
+
+	scanf("%d %d", &N, &M);
+	for (i = 1; i <= M; i++)
+	{
+		scanf("%d %d", &s, &e);
+		Rel[s][e] = 1;
+	}
+
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &bonus[i]);
+	}
+
+	Max_idx = 1;
+	for (i = 2; i <= N; i++)
+	{
+		if (bonus[Max_idx] < bonus[i])
+		{
+			Max_idx = i;
+		}
+	}
+	//printf("for_check = %d\n", for_check);
+
+	if (Max_idx != 1)
+	{
+		tmp = bonus[Max_idx];
+		bonus[Max_idx] = bonus[1];
+		bonus[1] = tmp;
+	}
+	chk[1] = 1;
+	Bonus_List[1] = bonus[1];
+}
+
+// ★★★★ L : 사람들이 받을 보너스..가 아니라 직원임!!!!
+void DFS(int L)
+{
+	int i;
+
+	//printf("L = %d\n", L);
+
+	if ( flag ) return;
+	if ( L > N )
+	{
+		flag = 1;
+		Print();
+		return;
+		//return 1;
+	}
+
+	// i : 보너스의 번호
+	for (i = 2; i <= N; i++)
+	{					// L의 이전 사람, 즉 L - 1 직원은 이미 보너스를 받음!
+		if ( (chk[i] == 1) || (Pride_Check(L, bonus[i]) == 1) )	continue;
+		chk[i] = 1;
+		Bonus_List[L] = bonus[i];
+
+		//if ( DFS(L + 1) == 1 ) return 1;
+		DFS(L + 1);
+
+		Bonus_List[L] = 0;
+		chk[i] = 0;
+	}
+	//return 0;
+}
+
+// ★★★★ 어떻게 상급/하급자를 비교하는지, 다른 체크(여기에서는 자존심)은 어떻게 해주면 좋을지 이해하고 사용
+// => 함수를 한 두개 정도를 더 만들어서 사용할 수 있다면 좋음!!
+// L : 직원, i : 보너스
+int Pride_Check(int L, int a)
+{
+	int j;
+
+	for (j = 2; j < L; j++)
+	{
+		if ( Rel[L][j] == 1 && Bonus_List[j] >= a ) return 1;		// L이 상급자
+		if ( Rel[j][L] == 1 && Bonus_List[j] <= a ) return 1;		// j가 상급자
+	}
+
+	return 0;
+}
+
+// 원래 버전...
+//// ★★★★ L : 사람들이 받을 보너스..가 아니라 직원임!!!!
+//void DFS(int L, int pay, int ses)
+//{
+//	int i, cnt = 0;
+//
+//	//printf("L = %d, pay = %d, ses = %d\n", L, pay, ses);
+//
+//	if (flag) return;
+//	if (L > N)
+//	{
+//		flag = 1;
+//		return;
+//	}
+//
+//	for (i = 2; i <= N; i++)
+//	{
+//		if (chk[i] || Rel[L][i] == 0)	// i가 직원
+//		{
+//			continue;
+//		}
+//
+//		chk[i] = 1;
+//		Bonus_List[L] = bonus[i];
+//
+//		DFS(L + 1, bonus[i], i);
+//
+//		Bonus_List[L] = 0;
+//		chk[i] = 0;
+//	}
+//}
+
+
+void Print(void)
+{
+	int i;
+
+	for (i = 1; i <= N; i++)
+	{
+		printf("%d ", Bonus_List[i]);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+
+
+
+
+// 문제 D3: [TST]토마토(초)
+#if 0
+#include <stdio.h>
+#define MAX	(105)
+
+typedef struct _st
+{
+	int y;
+	int x;
+	int z;
+}POS;
+
+POS QUEUE[MAX * MAX * MAX];
+
+void Input(void);
+void In_Queue(int zz, int yy, int xx);
+POS * Out_Queue(void);
+int BFS(void);
+void Print(void);
+
+int M, N, H;
+int Wp, Rp;
+int Box[MAX][MAX][MAX];
+int chk;
+int Min;
+int I, J, K;
+
+int main(void)
+{
+	//freopen("in.txt", "r", stdin);
+	
+	Input();
+	if ( chk == 0 )
+	{
+		printf("0\n");
+		return 0;
+	}
+
+	Min = BFS();
+	Print();
+	
+	return 0;
+}
+
+void In_Queue(int zz, int yy, int xx)
+{
+	QUEUE[Wp].z = zz;
+	QUEUE[Wp].y = yy;
+	QUEUE[Wp++].x = xx;
+}
+
+POS * Out_Queue(void)
+{
+	return &(QUEUE[Rp++]);
+}
+
+void Input(void)
+{
+	int k, i, j;
+	
+	Min = 500000;
+	chk = 0;
+	scanf("%d %d %d", &M, &N, &H);	// M : 가로 칸 수, N : 세로 칸 수, H : 높이(쌓아 올린 상자 수)
+	for (k = 1; k <= H; k++)
+	{
+		for (i = 1; i <= N; i++)
+		{
+			for (j = 1; j <= M; j++)
+			{
+				scanf("%d", &Box[k][i][j]);
+				if (Box[k][i][j] == 1)
+				{
+					In_Queue(k, i, j);
+				}
+				else if (Box[k][i][j] == 0)
+				{
+					chk++;
+				}
+			}
+		}
+	}
+}
+
+int BFS(void)
+{
+	POS * out = (POS *)0x0;
+	int i;
+	int nz, ny, nx;
+	int sz, sy, sx;
+	int dz[6] = {0, 0, 0, 0, -1, 1};
+	int dy[6] = {1, -1, 0, 0, 0, 0};
+	int dx[6] = {0, 0, -1, 1, 0, 0};
+
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sz = out->z;
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 6; i++)
+		{
+			nz = sz + dz[i];
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (nz < 1 || nz > H || ny < 1 || ny > N || nx < 1 || nx > M) continue;
+			if ( Box[nz][ny][nx] == 0 )
+			{
+				In_Queue(nz, ny, nx);
+				Box[nz][ny][nx] = Box[sz][sy][sx] + 1;
+				if (--chk == 0)
+				{
+					return Box[nz][ny][nx] - 1;
+				}
+			}
+			
+		}
+	}
+	return -1;
+}
+
+void Print(void)
+{
+	//int k, i, j;
+
+	//for (k = 1; k <= H; k++)
+	//{
+	//	for (i = 1; i <= N; i++)
+	//	{
+	//		for (j = 1; j <= M; j++)
+	//		{
+	//			printf("%d ", Box[k][i][j]);
+	//		}
+	//		printf("\n");
+	//	}
+	//	printf("\n");
+	//}
+
+	printf("%d\n", Min);
+}
+#endif
+
+
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Print(void);
+
+int main(void)
+{
+	Input();
+	Print();
+	return 0;
+}
+
+void Input(void)
+{
+
+}
+
+void Print(void)
+{
+
+}
+#endif
+
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Print(void);
+
+int main(void)
+{
+	Input();
+	Print();
+	return 0;
+}
+
+void Input(void)
+{
+
+}
+
+void Print(void)
+{
+
+}
+#endif
