@@ -1,0 +1,620 @@
+// [ DFS ] : 중복 X, 순서 중요한 순열 문제 + 조건(자존심 : 상급자가 하급자보다 보너스를 같거나 적게 받으면 자존심이 상하니 안됨!!)
+
+// ★★문제 D2: [TST]보너스★★	=>	★★★순열문제★★★
+#if 0
+#include <stdio.h>
+#define MAX	(110)
+#define NUMOPEO	(12)
+
+void Input(void);
+void DFS(int L);
+int Pride_Check(int L, int i);  // ★★ 가장 중요한 함수!! ★★
+void Print(void);
+
+int N;
+int M;
+int Rel[NUMOPEO][NUMOPEO];
+int bonus[NUMOPEO];
+int Bonus_List[NUMOPEO];
+int chk[NUMOPEO];
+int flag;
+int cnt;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	DFS(2);
+	//Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+	int s, e;
+	int Max_idx;
+	int tmp;
+
+	// 총 직원 수(N)과 상하관계수(M) 입력
+	scanf("%d %d", &N, &M);
+	// s(상) -> e(하) 관계 입력
+	for (i = 1; i <= M; i++)
+	{
+		scanf("%d %d", &s, &e);
+		// 상하관계 리스트를 만들자 by 배열 (근데 e -> s는 없고, ★★그렇기 때문에 배열의 반쪽만 사용!!!!!!!★★)
+		Rel[s][e] = 1;
+	}
+	// 직원 N명의 보너스 입력 (이것을 상하관계에 맞추어 모든 직원들의 자존심이 상하지 않게 주는 것!!)
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &bonus[i]);
+	}
+
+	// 일단 Max 보너스를 구해 사장인 1에게 먼저 주자!! (★가지 치기★)
+	Max_idx = 1;
+	for (i = 2; i <= N; i++)
+	{
+		if (bonus[Max_idx] < bonus[i])
+		{
+			Max_idx = i;
+		}
+	}
+	//printf("for_check = %d\n", for_check);
+
+	// 사장의 보너스가 bonus[Max_idx]이므로 그 보너스가 요소 1에 있지 않다면 1로 옮겨줌!!(★바뀌게 되는 보너스의 위치는 어디에 있든 상관 없음!!★)
+	if (Max_idx != 1)
+	{
+		tmp = bonus[Max_idx];
+		bonus[Max_idx] = bonus[1];
+		bonus[1] = tmp;
+	}
+	// ★ 그리고 DFS함수에서 2부터 시작할 것이므로 1에 체크해주고, 보너스 리스트에도 1에 넣어줌!! ★ (★가지 치기★)
+	chk[1] = 1;
+	Bonus_List[1] = bonus[1];
+}
+
+// ★★★★ L : 사람들이 받을 보너스..가 아니라 직원임!!!!
+// ★★★ L == 2부터 시작!!!
+void DFS(int L)
+{
+	int i;
+
+	//printf("L = %d\n", L);
+
+	if ( flag ) return;
+	if ( L > N )
+	{
+		flag = 1;
+		Print();
+		return;
+		//return 1;
+	}
+
+	// i : 보너스의 번호
+	for (i = 2; i <= N; i++)
+	{					// L의 이전 사람, 즉 L - 1 직원은 이미 보너스를 받음!
+		if ( (chk[i] == 1) || (Pride_Check(L, bonus[i]) == 1) )	continue;
+                                        // Pride_Check( , )가 1이라는 것은 자존심이 상했다는 것이고, 그럼 이 경우를 제외해주고 생각! (continue로 그냥 다음으로 넘겨버림!!)
+		chk[i] = 1;
+		Bonus_List[L] = bonus[i];
+
+		//if ( DFS(L + 1) == 1 ) return 1;
+		DFS(L + 1);
+
+		Bonus_List[L] = 0;
+		chk[i] = 0;
+	}
+	//return 0;
+}
+
+// ★★★★ 어떻게 상급/하급자를 비교하는지, 다른 체크(여기에서는 자존심)은 어떻게 해주면 좋을지 이해하고 사용
+// => 함수를 한 두개 정도를 더 만들어서 사용할 수 있다면 좋음!!
+// L : 직원, i : 보너스
+int Pride_Check(int L, int a)
+{
+	int j;
+
+	for (j = 2; j < L; j++)
+	{
+		if ( Rel[L][j] == 1 && Bonus_List[j] >= a ) return 1;		// L이 상급자
+		if ( Rel[j][L] == 1 && Bonus_List[j] <= a ) return 1;		// j가 상급자
+	}
+
+	return 0;
+}
+
+void Print(void)
+{
+	int i;
+
+	for (i = 1; i <= N; i++)
+	{
+		printf("%d ", Bonus_List[i]);
+	}
+	printf("\n");
+}
+#endif
+
+
+
+
+
+
+// [ BFS ] : 익은 토마토(1)를 중심으로 안 익은 토마토(0)를 익혀가며 (익는 것이 가능한) 토마토가 다 익을 때, 걸리는 시간의 최소를 구함
+// 특히 여기에서는 크게 세 가지 경우로 나뉘는데, 1) 안 익은 토마토가 하나도 없었던 상황(prt : 0) / 
+// 2) 안 익은 토마토가 -1에 둘러쌓여 익을 수 없는 상황(prt : -1) / 3) 안 익은 토마토가 모두 다 익은 상황(prt : 최소 시간)으로 나누는 것
+// => 그래서 chk(입력 시 안 익은 토마토의 개수를 셈) 변수가 굉장히 중요!! -> BFS 함수에서 토마토를 익혀가며 그만큼 "--chk"를 해주고, 그것이 0인지 아닌지 비교!!
+
+// 문제 D3: [TST]토마토(초)
+#if 0
+#include <stdio.h>
+#define MAX	(105)
+
+typedef struct _st
+{
+	int y;
+	int x;
+	int z;
+}POS;                           // ★★ 처음으로 나온 3차원 배열!!!!! ★★
+
+POS QUEUE[MAX * MAX * MAX];
+
+void Input(void);
+void In_Queue(int zz, int yy, int xx);
+POS * Out_Queue(void);
+int BFS(void);
+void Print(void);
+
+int M, N, H;
+int Wp, Rp;
+int Box[MAX][MAX][MAX];
+int chk;
+int Min;
+int I, J, K;
+
+int main(void)
+{
+	//freopen("in.txt", "r", stdin);
+
+	Input();
+	if ( chk == 0 )
+	{
+		printf("0\n");
+		return 0;
+	}
+
+	Min = BFS();
+	Print();
+
+	return 0;
+}
+
+void In_Queue(int zz, int yy, int xx)
+{
+	QUEUE[Wp].z = zz;
+	QUEUE[Wp].y = yy;
+	QUEUE[Wp++].x = xx;
+}
+
+POS * Out_Queue(void)
+{
+	return &(QUEUE[Rp++]);
+}
+
+void Input(void)
+{
+	int k, i, j;
+
+	// 전역변수 초기화해주는 습관!!
+	Min = 500000;
+	chk = 0;        // 0, 즉 익지 않은 토마토를 세어주기 위함!! => ★★★chk가 없다면, 바로 0으로 출력해야 하고, 나중에 BFS 함수를 통해 익지 않은 토마토가 다 없어졌는지, 계속 남아있는지 여부에 따라 출력 달라짐!★★★★
+	scanf("%d %d %d", &M, &N, &H);	// M : 가로 칸 수, N : 세로 칸 수, H : 높이(쌓아 올린 상자 수)
+	for (k = 1; k <= H; k++)
+	{
+		for (i = 1; i <= N; i++)
+		{
+			for (j = 1; j <= M; j++)
+			{
+				scanf("%d", &Box[k][i][j]);
+				// 익은 토마토에서부터 6방으로 퍼져나가며 안 익은 토마토를 익혀야 하기 때문에 1로 들어오는 순간 In_Queue해줌!!
+				if (Box[k][i][j] == 1)
+				{
+					In_Queue(k, i, j);
+				}
+				else if (Box[k][i][j] == 0)
+				{
+					chk++;
+				}
+			}
+		}
+	}
+}
+
+int BFS(void)
+{
+	POS * out = (POS *)0x0;
+	int i;
+	int nz, ny, nx;
+	int sz, sy, sx;
+	// 6방 체크!!! : 앞 뒤 좌 우 상 하
+	int dz[6] = {0, 0, 0, 0, -1, 1};
+	int dy[6] = {1, -1, 0, 0, 0, 0};
+	int dx[6] = {0, 0, -1, 1, 0, 0};
+
+	// Input() 함수에서 이미 In_Queue 시켜줌!!!
+	while (Wp > Rp)
+	{
+		out = Out_Queue();
+		sz = out->z;
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 6; i++)
+		{
+			nz = sz + dz[i];
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (nz < 1 || nz > H || ny < 1 || ny > N || nx < 1 || nx > M) continue;
+			// ★★★ Visit 배열이 꼭 필요한지, 없어도 될지 생각하며 설게하자!! ★★★
+			if ( Box[nz][ny][nx] == 0 )
+			{
+				In_Queue(nz, ny, nx);
+				Box[nz][ny][nx] = Box[sz][sy][sx] + 1;
+				// ★★ 핵심 조건 : 익지 않은 토마토가 0이 됐다, 즉 다 익혔다면 걸린 시간(마지막 - 처음) 구해주고, 그렇지 않아면 저 밑에 -1 return!! ★★
+				// 그리고 이 chk 변수가 Visit을 대신한다고 봐도 무방!!
+				if (--chk == 0)
+				{
+					return Box[nz][ny][nx] - 1;
+				}
+			}
+
+		}
+	}
+	return -1;
+}
+
+void Print(void)
+{
+	//int k, i, j;
+
+	//for (k = 1; k <= H; k++)
+	//{
+	//	for (i = 1; i <= N; i++)
+	//	{
+	//		for (j = 1; j <= M; j++)
+	//		{
+	//			printf("%d ", Box[k][i][j]);
+	//		}
+	//		printf("\n");
+	//	}
+	//	printf("\n");
+	//}
+
+	printf("%d\n", Min);
+}
+#endif
+
+
+
+
+
+
+// [ BFS ] : 그 길로 갔다 안 갔다도 중요하지만, 최소 거리로 갱신해주는 것이 필요하고, 그렇기에 Visit 배열을 그런 식으로 사용해야 함!!!
+
+// 문제 C8: [TST]귀가
+// 왜 In / Out _Queue 함수를 사용하면 뻑이 나는지 질문하고 싶음..!!
+// 문제 C8: [TST]귀가
+#if 01
+#include <stdio.h>
+#define ALPHABET        (150)
+
+//void In_Queue(int n);
+//int Out_Queue(void);
+void Input(void);
+void BFS(void);
+void Print(void);
+
+int P;
+int cow_house[ALPHABET][ALPHABET];
+int Min;
+int Queue[ALPHABET * ALPHABET / 4 * 3];
+int Visit_Sum[ALPHABET];        // ★★★★★
+int Wp, Rp;
+
+int main(void)
+{
+        Input();
+        BFS();
+        Print();
+
+    return 0;
+}
+
+// In_ / Out_ Queue 결국 사용 안함..!!
+//void In_Queue(int n)
+//{
+//        Queue[Wp++] = n;
+//}
+
+//int Out_Queue(void)
+//{
+//        return Queue[Rp++];
+//}
+
+void Input(void)
+{
+        int i, num = 0;
+        char a1 = 0, a2 = 0;
+
+        scanf("%d", &P);
+        for(i = 1; i <= P; i++)
+        {
+                fflush(stdin);
+                scanf(" %c %c %d", &a1, &a2, &num);
+                // A b 200도 있지만, b A 100도 있기 때문인가...?
+                if( (cow_house[a1][a2] == 0) || (cow_house[a1][a2] > num) )
+                {
+                        cow_house[a1][a2] = cow_house[a2][a1] = num;
+                }
+        }
+        // Visit 배열을 2차원으로 잡아도 무방하지만(기능적으로) 너무 비효율적.. 실제로 터지기도 했구..
+        // ★★ Visit 배열의 용도는 이미 그 곳(요소)에서 출발을 해서 다른 정점으로 갔었다는 것을 기록한 것!! ★★
+        // ★★ 그런데 그냥 1로 기록만 한 것이 아니라 최소값으로 갱신!! ★★
+        for(i = 'A'; i <= 'z'; i++)
+        {
+                Visit_Sum[i] = 0x7fedcba0;
+        }
+}
+
+void BFS(void)
+{
+        int i;
+        int out, check;
+        Wp = Rp = 0;
+
+        //In_Queue('Z');
+        // ★ In_Queue 함수를 활용하지 않고 이렇게 바로 바로 사용 가능!! (구조체를 이용하여 2 ~ 3개의 데이터를 같이 집어넣어 주는 경우가 아니라면!!)
+        Queue[Wp++] = 'Z';
+        Visit_Sum['Z'] = 0;
+
+        while(Wp > Rp)
+        {
+               //out = Out_Queue();
+               // ★ Out_Queue 함수를 활용하지 않고 이렇게 바로 바로 사용 가능!! (구조체를 이용하여 2 ~ 3개의 데이터를 같이 빼는 경우가 아니라면!!)
+               out = Queue[Rp++];
+               for(i = 'A'; i <= 'z'; i++)
+               {
+                       if( cow_house[out][i] == 0 ) continue;
+                       // 가장 좋은 값, 즉 최소 거리로 갱신!!
+                       check = cow_house[out][i] + Visit_Sum[out];
+                       if( Visit_Sum[i] > check )
+                       {
+                               Visit_Sum[i] = check;
+                               //In_Queue(i);
+                               Queue[Wp++] = i;
+                       }
+               }
+        }
+}
+
+void Print(void)
+{
+        int i;
+
+        Min = 'A';
+        for(i = 'B'; i < 'Z'; i++)
+        {
+                if( Visit_Sum[Min] > Visit_Sum[i] )
+                {
+                        Min = i;
+                }
+        }
+
+        printf("%c %d\n", Min, Visit_Sum[Min]);
+}
+#endif
+
+
+
+
+
+// [ 아이디어 문제 ] : ★★ 이런 문제는 문제를 제대로 이해하는 것이 가장 중요!!! ★★
+// 문제 D1: [TST]요플레 공장
+#if 0
+#include <stdio.h>
+#define MAX_W   (10001)
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int N;
+int S;
+int C[MAX_W];
+int Y[MAX_W];
+long long int Min_Cost;
+
+int main(void)
+{
+	Input();
+	Operation();
+	Print();
+	return 0;
+}
+
+void Input(void)
+{
+        int i;
+
+        scanf("%d %d", &N, &S);
+        for(i = 1; i <= N; i++)
+        {
+                scanf("%d %d", &C[i], &Y[i]);
+        }
+}
+
+void Operation(void)
+{
+        int i, j;
+        int min;
+        int check;
+
+        Min_Cost = C[1] * Y[1];
+        for(i = 2; i <= N; i++)
+        {
+                // 중복되는 계산은 나중에!!
+                min = C[i];             // 1) 그 주에 필요한 우유를 그 주의 가격으로 사자마자 사용하는 것이 더 좋나?
+                for(j = 1; j < i; j++)
+                {       // 중복되는 계싼은 나중에 2 !!! : ★ 특히 long long int가 예상될 때는 더욱 조심! ★
+                        check = C[j] + S * (i - j);     // 2)★★ 아니면 미리 사서 보관 비용을 지불하는 것이 더 싸나? (그렇다면 몇 주 전에 사야 하나?) ★★
+                        if(min > check) min = check;
+                }
+                Min_Cost += min * Y[i]; // 3) ★ 각 주에 필요한 우유를 언제 사는 것이 더 싼지 구하고, 각 주의 경우의 결과를 Min_Cost에 더해줌!! (그런데 첫 주에는 그냥 그 주에 필요한 우유 바로 사고 사용하면 되겠지?)
+        }
+}
+
+void Print(void)
+{
+        printf("%lld\n", Min_Cost);
+}
+#endif
+
+
+
+
+
+// 문제 D4: [TEST] 마름모
+#if 0
+#include <stdio.h>
+#define MAX_STR (30)
+
+void Input(void);
+void Operation(void);
+void Bubble_Sort(void);
+void Print(void);
+
+int N;
+int K;
+char str[MAX_STR + 10];
+int num[MAX_STR];
+int div4;
+
+int main(void)
+{
+    Input();
+    Operation();
+    Bubble_Sort();
+    Print();
+
+    return 0;
+}
+
+void Input(void)
+{
+    int i;
+
+    scanf("%d %d", &N, &K);
+    fflush(stdin);
+    for(i = 0; i < N; i++)
+    {
+        scanf("%1x", &str[i]);  // ★★16진수 1자씩..;;★★ 이게 가장 중요했던 것 같음...
+    }
+
+    div4 = N / 4;
+    for(i = 0; i < div4 - 1; i++)
+    {
+        str[N + i] = str[i];
+    }
+}
+
+void Operation(void)
+{
+    int i, j;
+    int sum;
+
+    for(i = 0; i < N; i++)
+    {
+        sum = 0;
+        for(j = 0; j <= div4 - 1; j++)
+        {
+            sum = sum * 16 + str[i + j];
+        }
+        num[i] = sum;
+    }
+}
+
+void Bubble_Sort(void)
+{
+    int i, j;
+    int tmp;
+    int flag;
+
+    for(i = 0; i < N - 1; i++)
+    {
+        flag = 1;
+        for(j = 0; j < N - i - 1; j++)
+        {
+            if( num[j] < num[j + 1] )
+            {
+                flag = 0;
+                tmp = num[j + 1];
+                num[j + 1] = num[j];
+                num[j] = tmp;
+            }
+        }
+        if( flag ) break;
+    }
+}
+
+void Print(void)
+{
+    int i, cnt = 0;
+
+    for(i = 0; i <= N - 2; i++)
+    {
+        if(num[i] == num[i + 1]) cnt++;         // ★★★같으면 끌어당기고 삭제하고 할 바에야 이렇게 같은 개수를 구해서 +시켜주면 편함!!
+    }
+
+    printf("%d\n", num[K - 1 + cnt]);
+}
+#endif
+
+
+
+
+
+//
+#if 0
+#include <stdio.h>
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int main(void)
+{
+        Input();
+        Operation();
+        Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+
+}
+
+void Operation(void)
+{
+
+
+}
+
+void Print(void)
+{
+
+}
+#endif
