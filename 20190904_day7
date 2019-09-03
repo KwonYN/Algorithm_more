@@ -1,0 +1,1105 @@
+
+// [ 20190903 화요일!] 
+// 문제 A7: [TST]문자열 검색
+#if 0
+#include <stdio.h>
+
+void Input(void);
+unsigned long hash(unsigned char *str, int n);
+long long Hhash(char *p, int len); //라빈카프 방식
+int solve(void);
+int Str_Comp(char * p, char * q, int n);
+void Operation(void);
+void Print(void);
+
+int N;
+int M;
+char Original[3000300];
+char Pattern[55];
+int cnt;
+int loc[3000300];
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	//Operation();
+	Print();
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	scanf("%d", &N);
+	scanf("%s", Original);
+	scanf("%d", &M);
+	scanf("%s", Pattern);
+}
+
+// [ 1 ] 해쉬 기본
+// ★ 살짝 변형을 가하긴 했지만, 이런 Hash 함수 외우면 좋음!! (특히 문자열 관련!) ★
+unsigned long hash(unsigned char *str, int n)
+{
+	unsigned long hash = 5381; // 소수
+	int i;
+	
+	for (i = 0; i < n; i++)
+	{
+		hash = ((hash << 5) + hash) + str[i];
+	}
+
+	return hash;
+}
+
+// [ 2 ] 라빈카프 방식 기본
+// ★ 라빈카프 방식 ★
+long long Hhash(char *p, int len)	//라빈카프 방식
+{
+	int i;
+	long long hash = 0, pow = 1;
+	for (i = len - 1; i >= 0; i--)
+	{
+		hash += p[i] * pow;			//정수형 상수 default -> int
+		pow <<= 1;
+	}
+
+	return hash;
+}
+
+// [ 1, 2 ] 문자열 해쉬 함수(including 라빈카프) 방식을 활용한 Operation 함수
+void Operation(void)
+{
+	int i;
+	//unsigned long int hash_Pattern = hash(Pattern, M);
+	//unsigned long int hash_Original;
+	long long int hash_Pattern = Hhash(Pattern, M);
+	long long int hash_Original;
+
+	cnt = 0;
+	for (i = 0; i < N - M + 1; i++)
+	{
+		hash_Original = Hhash(Original + i, M);
+		if ( hash_Pattern != hash_Original ) continue;
+		if ( Str_Comp(Original + i, Pattern, M) )
+		{
+			cnt++;
+			loc[cnt] = i + 1;
+		}
+	}
+}
+
+// [ 3 ] ★ 라빈카프 해쉬 함수를 활용하여 구하기 - 계속 함수 호출하지 않고, 뺑글 뺑글 돌도록 (슬라이딩 윈도우) ★
+int solve(void)
+{
+	long long str_hash, word_hash;
+	long long pow = 1LL << (M - 1); // 첫번째 글자 자리의 2^(M-1)승
+	int i;
+	
+	cnt = 0;
+	str_hash = Hhash(Original, M); // 문장에서 M자 만큼만 해쉬키 값 구함
+	word_hash = Hhash(Pattern, M); // 찾을 단어의 해쉬키 값 구함
+	for (i = 0; i <= N - M; i++)
+	{
+		if (str_hash == word_hash && Str_Comp(&Original[i], Pattern, M) == 1)
+		{   // str+i = &str[i]는 문자열은 주소개념이기 때문에
+			loc[cnt] = i + 1;
+			cnt++;
+		}
+		str_hash = (str_hash - Original[i] * pow) * 2 + Original[i + M];
+		// str[i]*pow인 이유는 맨 앞 자리이기 때문에
+		// 슬라이싱 기법 
+	}
+
+	if (cnt == 0) cnt = -1;
+	return cnt;
+}
+
+// [ 4 ] 해쉬 함수 이용하지 않고 그냥 for 문만 돌렸는데 훨씬 빠르게 나옴. 한 1억 번 도는 것은 괜찮은 것 같음!
+//void Operation(void)
+//{
+//	int i;
+//
+//	for (i = 0; i < N; i++)
+//	{
+//		if (Original[i] = Pattern[0])
+//		{
+//			if (Str_Comp(Original + i + 1, Pattern + 1, M - 1))
+//			{
+//				cnt++;
+//				loc[cnt] = i + 1;
+//			}
+//		}
+//	}
+//}
+
+// 문자열 비교 함수 (인자로 몇 개 비교하는지까지 받아줬음)
+int Str_Comp(char * p, char * q, int n)
+{
+	int i;
+
+	for (i = 0; i < n; i++)
+	{
+		if (p[i] != q[i]) return 0;
+	}
+
+	return 1;
+}
+
+void Print(void)
+{
+	int i;
+
+	// [ 1, 2, 4 ] 출력
+	//if (cnt == 0)
+	//{
+	//	printf("%d\n", -1);
+	//}
+	//else
+	//{
+	//	printf("%d\n", cnt);
+
+	//	for (i = 1; i <= cnt; i++)
+	//	{
+	//		printf("%d\n", loc[i]);
+	//	}
+	//}
+
+	// [ 3 ] 출력
+	printf("%d\n", solve());
+
+	if (cnt != -1)
+	{
+		for (i = 0; i < cnt; i++)
+		{
+			printf("%d\n", loc[i]);
+		}
+	}
+}
+#endif
+
+
+
+
+
+
+// 문제 A8: [TST]자동차경주대회-SPJ	=> 미완 / 추후에 이 방법으로 다시 풀기!
+#if 0
+#include <stdio.h>
+#define MAX	(110)
+
+void Input(void);
+void BFS(int x);
+void Print(void);
+
+int Km;
+int N;
+int Track[MAX][MAX];
+int dist[MAX];
+int JB[MAX];
+int Visit[MAX];
+int Path[MAX];
+int Queue[MAX * MAX * 30];
+int Wp, Rp;
+int Min;
+int flag;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	BFS(0);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+
+	scanf("%d", &Km);
+	scanf("%d", &N);
+
+	Track[0][0] = 0;
+	for (i = 1; i <= N + 1; i++)
+	{
+		scanf("%d", &dist[i]);	// 시작점 : 정비소 i를 기준으로 지금까지 온 거리(Not 누적)
+		Track[0][i] = Track[0][i - 1] + dist[i];
+	}
+
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &JB[i]);		// 정비소 : i를 기준으로 i 정비소를 이용해야 할 때 걸리는 시간
+	}
+
+	for (i = 1; i <= N; i++)				// 시작점
+	{
+		for (j = i + 1; j <= N + 1; j++)	// 도착점
+		{
+			Track[i][j] = Track[i][j - 1] + dist[j];
+		}
+	}
+}
+
+void BFS(int x)
+{
+	int i, out;
+
+	Wp = Rp = 0;
+	Queue[Wp++] = x;
+	Visit[x] = 0;
+
+	while (Wp > Rp)
+	{
+		out = Queue[Rp++];
+		for (i = out + 1; i <= N; i++)
+		{
+			if (Track[out][i] <= Km)
+			{
+				Visit[i] = JB[i];
+				Queue[Wp++] = i;
+			}
+		}
+	}
+}
+
+void Print(void)
+{
+	int i, j;
+
+	for (i = 0; i <= N; i++)
+	{
+		for (j = 0; j <= N + 1; j++)
+		{
+			printf("%4d", Track[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+
+	for (i = 0; i <= N; i++)
+	{
+		for (j = 0; j <= N + 1; j++)
+		{
+			printf("%4d", Visit[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+
+	printf("%d\n", Min);
+}
+#endif
+
+// 다른 버전
+#if 0
+#include <stdio.h>
+#define MAX	(110)
+
+void Input(void);
+void BFS(int s);
+void Recursive_Print(int num);
+void Print(void);
+
+int Km;
+int N;
+int dist[MAX];		// (전 정비소 or 출발 지점)s -> e(다음 정비소 or 도착지점 : i)까지의 거리
+int JB[MAX];		// 정비소 i에서의 정비 소요 시간
+int Visit[MAX];		// ★ 요소 i는 정비소의 i를 의미, Visit[i] = i 정비소에 까지의 정비 소요 시간의 합의 최소!
+int Path[MAX];		// 정비소 i에 오기 직전에 어떤 정비소(out)에서 출발하여 도착했는지
+int Queue[MAX * MAX * 30];
+int Wp, Rp;
+int cnt;			// Path에 값들을 저장해놓고, 후에 재귀 출력 함수를 통해 출력할 때마다 cnt++해줌
+int Gajichigi;		// 처음에 들어온 거리 값들의 합 -> 입력된 Km 이하면, 이후 활동 할 필요 없이 무조건 0!
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+
+	Input();
+
+	/* 입력된 각 정비소까지의 거리(dist[i])의 합이 정비 받지 않고 갈 수 있는 최대 거리(Km) 이하이면,
+	   정비 받지 않고 갈 수 있기 때문에 0 출력 */
+	if (Gajichigi <= Km) printf("0\n");
+	// 그렇지 않다면, BFS 및 재귀 출력 함수를 통해서 값들 구해주고, 출력해야 함!
+	else
+	{
+		BFS(0);
+		Print();
+	}
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	Gajichigi = 0;
+	scanf("%d", &Km);
+	scanf("%d", &N);
+	for (i = 1; i <= N + 1; i++)
+	{
+		scanf("%d", &dist[i]);// 시작점 : 정비소 i를 기준으로 지금까지 온 거리(Not 누적)
+		Visit[i] = 987654321;// Visit 배열은 정비시간들 합의 최소값을 넣어줄 것이기 때문에 큰 값으로 초기화
+		Gajichigi += dist[i];// 초반에 가지치기 해주고, 이후에는 다른 조건 신경 안 쓰기 위함!
+	}
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &JB[i]);		// 정비소 : i를 기준으로 i 정비소를 이용해야 할 때 걸리는 시간
+	}
+}
+
+void BFS(int s)
+{
+	int i;
+	int out;
+	int sum_dist;	// Km보다 큰지, 이하인지 판단해주기 위해! (Que가 돌 때마다(=while) 0으로 초기화! <1>)
+	int check;		// 값들의 합을 Visit 배열에 최소값인지 판정하여 저장해주기 위한 변수(두 번 쓰는 것 피하기 위함)
+
+	Wp = Rp = 0;
+	Queue[Wp++] = s;
+	Visit[s] = 0;
+	Path[s] = 0;
+
+	while (Wp > Rp)
+	{
+		sum_dist = 0;
+		out = Queue[Rp++];
+		for (i = out + 1; i <= N + 1; i++)
+		{
+			sum_dist += dist[i];
+			if (sum_dist > Km) break;
+			check = Visit[out] + JB[i];
+			/* <1> sum_dist가 조건을 만족할 때, 다 정비소에 갈 수 있다는 뜻이고, 정비소에 다 들르도록 함.
+			   동시에 Visit 배열에 최소값으로 갱신, Path 기록!*/
+			if (Visit[i] > check)
+			{
+				Visit[i] = check;
+				Queue[Wp++] = i;
+				Path[i] = out;
+			}
+		}
+	}
+}
+
+void Recursive_Print(int num)
+{
+	if (Path[num] == 0)
+	{
+		printf("%d\n", cnt);
+		return;
+	}
+
+	cnt++;
+	Recursive_Print( Path[num] );
+
+	printf("%d ", Path[num]);
+}
+
+void Print(void)
+{
+	//int i;
+
+	//for (i = 0; i <= N; i++)
+	//{
+	//	printf("%4d", Visit[i]);
+	//}
+	//printf("\n");
+
+	cnt = 0;
+	printf("%d\n", Visit[N + 1]);
+	Recursive_Print(N + 1);
+}
+#endif
+
+
+
+
+
+
+// 문제 A9: [TEST] 나무쌓기
+#if 0
+#include <stdio.h>
+#define MAX	(60)
+
+void Input(void);
+void DFS(int L, int idx);
+int Check(int idx, int i);
+void Print(void);
+void Init(void);
+
+int T;
+int N;
+int ARR[MAX];
+int Max;
+
+int main(void)
+{
+	int i;
+
+	freopen("in.txt", "r", stdin);
+
+	scanf("%d", &T);
+	for (i = 1; i <= T; i++)
+	{
+		Input();
+		DFS(0, 1);
+		Print();
+		Init();
+	}
+
+	return 0;
+}
+
+
+void Input(void)
+{
+	int i;
+
+	Max = -1;
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &ARR[i]);
+	}
+}
+
+void DFS(int L, int idx)
+{
+	int i;
+	int chk[4] = { 0 };
+	//printf("L = %d, idx = %d\n", L, idx);
+	//printf("flag = %d\n", flag);
+
+	if ( Max > 0 ) return;
+	if ( idx > N )
+	{
+		Max = L;
+		return;
+	}
+	
+	// 1개 나무로 층을 쌓을 수 있을 때
+	if (ARR[idx] == 2 || idx == N) DFS(L + 1, idx + 1);
+
+	// 2개 나무로 층을 쌓을 때
+	if (ARR[idx] != ARR[idx + 1]) DFS(L + 1, idx + 2);
+	//else return;
+	// 이 조건까지 추가한다면, 바로 다음에 "ARR[idx] != ARR[idx + 1]" 조건 빼줄 수도 있어!!
+		
+	// 3개 나무로 층을 쌓을 때
+	if (ARR[idx] + ARR[idx + 1] + ARR[idx + 2] == 6 && ARR[idx] != ARR[idx + 1]) DFS(L + 1, idx + 3);
+
+	//for (i = 0; i < 3; i++)
+	//{
+	//	if (Check(idx, i))
+	//	{
+	//		DFS(L + 1, idx + i + 1);// => < 1 > 체크 함수를 활용하여 조건을 그 함수 안에 모아놓을 수 있음
+	//	}
+	//}
+}
+
+//int Check(int idx, int i)
+//{
+//	switch (i)
+//	{
+//		case 0 : 
+//			if ( ARR[idx + i] == 2 ) return 1;
+//			if ( idx + i == N ) return 1;
+//			break;
+//		case 1 :
+//			if (ARR[idx] != ARR[idx + 1]) return 1;
+//			break;
+//		default:
+//			if ( ARR[idx] + ARR[idx + 1] + ARR[idx + 2] == 6
+//				&& ARR[idx] != ARR[idx + 1] ) return 1;
+//			break;
+//	}
+//
+//	return 0;
+//}
+
+void Print(void)
+{
+	printf("%d\n", Max);
+}
+
+void Init(void)
+{
+	int i;
+
+	for (i = 1; i <= N; i++)
+	{
+		ARR[i] = 0;
+	}
+}
+#endif
+
+
+
+
+
+
+// 문제 B0: [TST]안전 영역
+/*
+	Keyword : "영역", "이하"
+*/
+#if 0
+#include <stdio.h>
+#define MAX	(110)
+
+typedef struct
+{
+	int y, x;
+}HIGH;
+HIGH Queue[MAX * MAX * 10];
+
+void Input(void);
+int Operation(int High);
+void InQ(int yy, int xx);
+HIGH * OutQ(void);
+int BFS(int sy, int sx, int High);
+void Init_Visit(void);
+void Print(void);
+
+int N;
+int Input_Min;
+int Input_Max;
+int Region[MAX][MAX];
+int Wp, Rp;
+int Max;
+int Visit[MAX][MAX];
+
+int main(void)
+{
+	int i, r;
+
+	freopen("in.txt", "r", stdin);
+	Input();
+	
+	if ( Input_Min == Input_Max )
+	{
+		printf("%d\n", (Input_Min == Input_Max));
+		return 0;
+	}
+	for (i = Input_Min; i < Input_Max; i++)
+	{
+		r = Operation(i);
+		//printf("r = %d\n", r);
+		if (Max < r) Max = r;
+		Init_Visit();
+	}
+
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+
+	Max = 0;
+	Input_Min = 999;
+	Input_Max = 0;
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			scanf("%d", &Region[i][j]);
+			if (Input_Min > Region[i][j]) Input_Min = Region[i][j];
+			if (Input_Max < Region[i][j]) Input_Max = Region[i][j];
+		}
+	}
+}
+
+void InQ(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp++].x = xx;
+}
+
+HIGH * OutQ(void)
+{
+	return &(Queue[Rp++]);
+}
+
+int BFS(int sy, int sx, int High)
+{
+	HIGH * out = (HIGH *)0x0;
+	int dy[4] = { -1, 1, 0, 0 };
+	int dx[4] = { 0, 0, -1, 1 };
+	int ny, nx, i;
+
+	InQ(sy, sx);
+	Visit[sy][sx] = 1;
+
+	while (Wp > Rp)
+	{
+		out = OutQ();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if ( Region[ny][nx] > High && Visit[ny][nx] == 0 )
+			{
+				InQ(ny, nx);
+				Visit[ny][nx] = 1;
+			}
+		}
+	}
+
+	return 1;
+}
+
+int Operation(int High)
+{
+	int i, j, cnt = 0;
+	cnt = 0;
+	Wp = Rp = 0;
+
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			if (Region[i][j] > High && Visit[i][j] == 0)
+			{
+				cnt += BFS(i, j, High);
+			}
+		}
+	}
+
+	return cnt;
+}
+
+void Init_Visit(void)
+{
+	int i, j;
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			Visit[i][j] = 0;
+		}
+	}
+}
+
+void Print(void)
+{
+	//int i, j;
+
+	//for (i = 1; i <= N; i++)
+	//{
+	//	for (j = 1; j <= N; j++)
+	//	{
+	//		printf("%d ", Region[i][j]);
+	//	}
+	//	printf("\n");
+	//}
+
+	printf("%d\n", Max);
+}
+#endif
+
+
+// 안전 영역 비슷하지만 필기 있는 ver.
+#if 0
+#include <stdio.h>
+#define MAX (110)
+
+typedef struct
+{
+	int y, x;
+}HIGH;
+HIGH Queue[MAX * MAX * 10];
+
+void Input(void);
+int Operation(int High);
+void InQ(int yy, int xx);
+HIGH * OutQ(void);
+int BFS(int sy, int sx, int High);
+void Init_Visit(void);
+void Print(void);
+
+int N;
+int Input_Min;
+int Input_Max;
+int Region[MAX][MAX];
+int Wp, Rp;
+int Max;
+int Visit[MAX][MAX];
+
+int main(void)
+{
+	int i, r;
+
+	//freopen("in.txt", "r", stdin);
+	Input();
+
+	// 애초에 모두 같은 높이가 입력되었다면, 홍수가 났을 때 1 아니면 0개의 안전지대가 생김 => 문제의 히든 조건 : 높이의 최대값 이상의 홍수가 났을 때는 당연히 안전 지대가 없게 됨. 하지만 Operation과 BFS의 조건으로는 높이 최대값 - 1만큼의 홍수까지 계산하므로 당연히 0이 나오게 됨. 이는 안전지대 수의 최대값이 될 수 없으므로, 예외로 처리!
+	if (Input_Min == Input_Max)
+	{
+		printf("%d\n", (Input_Min == Input_Max));   // 1이 출력될 것!!
+		return 0;
+	}
+
+	// 홍수가 (높이의 최소값) ~ (높이의 최대값 - 1)일 때의 안전지대의 수를 카운트 해주기 위함 => 이 중에서 안전지대 수의 최대값을 찾기 위한 조건으로 최대값을 거름
+	for (i = Input_Min; i < Input_Max; i++)
+	{
+		r = Operation(i);
+
+		//printf("r = %d\n", r);    // 디버깅용
+
+		if (Max < r) Max = r;
+		Init_Visit();
+	}
+
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+
+	Max = 0;
+	Input_Min = 999;
+	Input_Max = 0;  // 여기까지 초기화
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			scanf("%d", &Region[i][j]);
+			if (Input_Min > Region[i][j]) Input_Min = Region[i][j];// 높이 최소값
+			if (Input_Max < Region[i][j]) Input_Max = Region[i][j];// 높이 최대값
+		}
+	}
+}
+
+void InQ(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp++].x = xx;
+}
+
+HIGH * OutQ(void)
+{
+	return &(Queue[Rp++]);
+}
+
+// 홍수의 높이보다 높은 안전지대를 중심으로 인접해있는 다른 안전지대를 탐색하며 
+// 이미 홍수의 높이보다 높다는 조건에 의해 걸러져 들어왔으므로 리턴은 무조건 1
+int BFS(int sy, int sx, int High)
+{
+	HIGH * out = (HIGH *)0x0;
+	int dy[4] = { -1, 1, 0, 0 };
+	int dx[4] = { 0, 0, -1, 1 };
+	int ny, nx, i;
+
+	InQ(sy, sx);
+	Visit[sy][sx] = 1;
+
+	while (Wp > Rp)
+	{
+		out = OutQ();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (Region[ny][nx] > High && Visit[ny][nx] == 0)
+			{
+				InQ(ny, nx);
+				Visit[ny][nx] = 1;
+			}
+		}
+	}
+
+	return 1;
+}
+
+// 홍수의 높이를 인자로 받고(from main함수), 조건에 만족하는 정점을 BFS함수로!
+int Operation(int High)
+{
+	int i, j, cnt = 0;
+	cnt = 0;
+	Wp = Rp = 0;
+
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			if (Region[i][j] > High && Visit[i][j] == 0)
+			{
+				cnt += BFS(i, j, High);
+			}
+		}
+	}
+
+	return cnt;
+}
+
+// Visit 배열이 전역변수이므로 홍수의 높이가 달라질 때마다(조건) 초기화 해주기 위함
+void Init_Visit(void)
+{
+	int i, j;
+
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			Visit[i][j] = 0;
+		}
+	}
+}
+
+void Print(void)
+{
+	//int i, j;
+
+	//for (i = 1; i <= N; i++)
+	//{
+	//  for (j = 1; j <= N; j++)
+	//  {
+	//      printf("%d ", Region[i][j]);
+	//  }
+	//  printf("\n");
+	//}                     // 디버깅용
+
+	printf("%d\n", Max);        // 안전지대 수의 최대값
+}
+#endif
+
+
+
+
+
+// 문제 B1: [TST] 인형 정리(BASIC)
+#if 0
+#include <stdio.h>
+#define MAX	(100010)
+
+void Input(void);
+void Find_Permutation(int L);
+void Print_List(int L);
+int Find_Doll(int L);
+void Print(void);
+
+int N;
+int M;
+int Doll[MAX];
+int chk[15][MAX];
+int Check[15];
+int List[15];
+int cnt;
+int Min;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	Find_Permutation(1);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+
+	Min = 999999;
+	scanf("%d", &N);
+	scanf("%d", &M);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &Doll[i]);
+		chk[ Doll[i] ][i]++;
+	}
+
+	for (i = 1; i <= M; i++)
+	{
+		for (j = 2; j <= N; j++)
+		{
+			chk[i][j] += chk[i][j - 1];
+		}
+	}
+}
+
+void Find_Permutation(int L)
+{
+	int i, r;
+
+	if (L > M)
+	{
+		Print_List(L);// 디버깅
+
+		r = Find_Doll(L);
+		if (Min > r) Min = r;
+
+		printf("r = %d\n", r);//디버깅
+		return;
+	}
+
+	for (i = 1; i <= M; i++)
+	{
+		if ( Check[i] != 0 ) continue;
+		List[L] = i;
+		Check[i] = 1;
+		Find_Permutation(L + 1);
+		Check[i] = 0;
+		List[L] = 0;
+	}
+}
+
+int Find_Doll(int L)
+{
+	int i;
+	int sum = 0;
+	cnt = 0;
+
+	for (i = 1; i < L; i++)
+	{
+		cnt += chk[ List[i] ][ N ]
+			- ( chk[  List[i]  ][  sum + chk[ List[i] ][ N ]  ] - chk[ List[i] ][ sum ] );
+		sum += chk[List[i]][N];
+	}
+
+	//for (j = 1; j <= M; j++)
+	//{
+	//	for (i = sum + 1; i <= sum + chk[ List[j] ]; i++)
+	//	{
+	//		//printf("Doll[i] = Doll[%d] = %d, List[j] = List[%d] = %d\n", i, Doll[i], j, List[j]);
+	//		if ( Doll[i] != List[j] ) cnt++;
+	//	}
+	//	if (cnt >= Min) return 999999;
+	//	sum += chk[List[j]];
+	//}
+
+	return cnt;
+}
+
+void Print_List(int L)
+{
+	int i;
+
+	for (i = 1; i < L; i++)
+	{
+		printf("%d ", List[i]);
+	}
+	printf("\n");
+}
+
+void Print(void)
+{
+	//int i, j;
+
+	//printf("%d %d %d %d\n", chk[1], chk[2], chk[3], chk[4]);
+
+	//for (i = 1; i <= M; i++)
+	//{
+	//	for (j = 1; j <= N; j++)
+	//	{
+	//		printf("%d ", chk[i][j]);
+	//	}
+	//	printf("\n");
+	//}
+
+	printf("%d\n", Min);
+}
+#endif
+
+// 인형정리 DFS함수로 끝내는 ver.
+#if 0
+#include <stdio.h>
+#define MAX (100010)
+
+void Input(void);
+void DFS(int L, int idx, int count);
+void Print(void);
+
+int N, M;
+int Doll[MAX];
+int chk[15][MAX];
+int Check[15];
+int List[15];
+int Min;
+
+int main(void)
+{
+	Input();
+	DFS(1, 0, 0);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+
+	Min = 999999;
+	scanf("%d", &N);
+	scanf("%d", &M);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &Doll[i]);
+		chk[Doll[i]][i]++;        // m(1 ~ M)번 인형 카운트
+	}                   // m번 인형을 m번째 행에!
+
+	for (i = 1; i <= M; i++)
+	{
+		for (j = 2; j <= N; j++)
+		{
+			chk[i][j] += chk[i][j - 1]; // i번 인형을 i번째 행에 놓고,
+		}               // j(1 ~ N)번째 입력을 j열에 놓고
+	}                   // 누적(★)해서 각각 몇 개인지 표시!!!
+}
+
+// L : 깊이 , idx : 순열의 L번째 요소의 마지막 위치(?) , count : 순열 vs 입력받은 배열을 비교했을 때 다른 값(인형)의 개수 카운트  
+void DFS(int L, int idx, int count)
+{
+	int i;
+
+	if (L > M)
+	{
+		if (Min > count) Min = count;
+		return;
+	}
+
+	// 순열의 대상 수( = 인형 : 1 ~ M)
+	for (i = 1; i <= M; i++)
+	{
+		// 중복될 수 없음 (정리된 인형은 같은 종류가 모두 연속되도록 놓음)
+		if (Check[i] != 0) continue;
+
+		List[L] = i;
+		Check[i] = 1;
+		idx += chk[List[L]][N];
+		count += chk[List[L]][N] - (chk[List[L]][idx] - chk[List[L]][idx - chk[List[L]][N]]);
+
+		// L(1 ~ M)번 인형을 선택(in 순열)했으면, 다음 DFS 호출
+		// idx는 다음 번(L + 1) 인형의 변화 전 개수를 기록하기 위함(열로 활용)
+		// count는 원래 있어야 할 L번 인형이 입력된 인형의 순서( = Input, 변화 전 인형 배치)와 비교했을 때, 얼마나 다른가(즉, "몇 개나 이동시켜야" 같은 종류의 인형이 연속으로 놓이도록 하는가, 또는 "몇 개의 인형을 옮겨야" 하는가)를 누적해주기 위함!!!
+		DFS(L + 1, idx, count);
+
+		count -= chk[List[L]][N] - (chk[List[L]][idx] - chk[List[L]][idx - chk[List[L]][N]]);
+		idx -= chk[List[L]][N];
+		Check[i] = 0;
+		List[L] = 0;
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", Min);
+}
+#endif
