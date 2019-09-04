@@ -1,0 +1,1224 @@
+// 문제 B1: [TST] 인형 정리(BASIC)
+#if 0
+#include <stdio.h>
+#define MAX	(100010)
+
+void Input(void);
+void Find_Permutation(int L);
+void Print_List(int L);
+int Find_Doll(int L);
+void Print(void);
+
+int N;
+int M;
+int Doll[MAX];
+int chk[15][MAX];
+int Check[15];
+int List[15];
+int cnt;
+int Min;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	Find_Permutation(1);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+
+	Min = 999999;
+	scanf("%d", &N);
+	scanf("%d", &M);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &Doll[i]);
+		chk[ Doll[i] ][i]++;
+	}
+
+	for (i = 1; i <= M; i++)
+	{
+		for (j = 2; j <= N; j++)
+		{
+			chk[i][j] += chk[i][j - 1];
+		}
+	}
+}
+
+void Find_Permutation(int L)
+{
+	int i, r;
+
+	if (L > M)
+	{
+		Print_List(L);// 디버깅
+
+		r = Find_Doll(L);
+		if (Min > r) Min = r;
+
+		printf("r = %d\n", r);//디버깅
+		return;
+	}
+
+	for (i = 1; i <= M; i++)
+	{
+		if ( Check[i] != 0 ) continue;
+		List[L] = i;
+		Check[i] = 1;
+		Find_Permutation(L + 1);
+		Check[i] = 0;
+		List[L] = 0;
+	}
+}
+
+int Find_Doll(int L)
+{
+	int i;
+	int sum = 0;
+	cnt = 0;
+
+	for (i = 1; i < L; i++)
+	{
+		cnt += chk[ List[i] ][ N ]
+			- ( chk[  List[i]  ][  sum + chk[ List[i] ][ N ]  ] - chk[ List[i] ][ sum ] );
+		sum += chk[List[i]][N];
+	}
+
+	//for (j = 1; j <= M; j++)
+	//{
+	//	for (i = sum + 1; i <= sum + chk[ List[j] ]; i++)
+	//	{
+	//		//printf("Doll[i] = Doll[%d] = %d, List[j] = List[%d] = %d\n", i, Doll[i], j, List[j]);
+	//		if ( Doll[i] != List[j] ) cnt++;
+	//	}
+	//	if (cnt >= Min) return 999999;
+	//	sum += chk[List[j]];
+	//}
+
+	return cnt;
+}
+
+void Print_List(int L)
+{
+	int i;
+
+	for (i = 1; i < L; i++)
+	{
+		printf("%d ", List[i]);
+	}
+	printf("\n");
+}
+
+void Print(void)
+{
+	//int i, j;
+
+	//printf("%d %d %d %d\n", chk[1], chk[2], chk[3], chk[4]);
+
+	//for (i = 1; i <= M; i++)
+	//{
+	//	for (j = 1; j <= N; j++)
+	//	{
+	//		printf("%d ", chk[i][j]);
+	//	}
+	//	printf("\n");
+	//}
+
+	printf("%d\n", Min);
+}
+#endif
+
+// 인형정리 DFS함수로 끝내는 ver.
+#if 0
+#include <stdio.h>
+#define MAX (100010)
+
+void Input(void);
+void DFS(int L, int idx, int count);
+void Print(void);
+
+int N, M;
+int Doll[MAX];
+int chk[15][MAX];
+int Check[15];
+int List[15];
+int Min;
+
+int main(void)
+{
+	Input();
+	DFS(1, 0, 0);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+
+	Min = 999999;
+	scanf("%d", &N);
+	scanf("%d", &M);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &Doll[i]);
+		chk[Doll[i]][i]++;      // m(1 ~ M)번 인형 카운트
+	}							// m번 인형을 m번째 행에!
+
+	for (i = 1; i <= M; i++)
+	{
+		for (j = 2; j <= N; j++)
+		{
+			chk[i][j] += chk[i][j - 1]; // i번 인형을 i번째 행에 놓고,
+		}							    // j(1 ~ N)번째 입력을 j열에 놓고
+	}									// 누적(★)해서 각각 몇 개인지 표시!!!
+}
+
+// L : 깊이 , idx : 순열의 L번째 요소의 마지막 위치(?) , count : 순열 vs 입력받은 배열을 비교했을 때 다른 값(인형)의 개수 카운트  
+void DFS(int L, int idx, int count)
+{
+	int i;
+
+	if (L > M)
+	{
+		if (Min > count) Min = count;
+		return;
+	}
+
+	// 순열의 대상 수( = 인형 : 1 ~ M)
+	for (i = 1; i <= M; i++)
+	{
+		// 중복될 수 없음 (정리된 인형은 같은 종류가 모두 연속되도록 놓음)
+		if (Check[i] != 0) continue;
+
+		List[L] = i;
+		Check[i] = 1;
+		idx += chk[List[L]][N];
+		count += chk[List[L]][N] - (chk[List[L]][idx] - chk[List[L]][idx - chk[List[L]][N]]);
+
+		// L(1 ~ M)번 인형을 선택(in 순열)했으면, 다음 DFS 호출
+		// idx는 다음 번(L + 1) 인형의 변화 전 개수를 기록하기 위함(열로 활용)
+		// count는 원래 있어야 할 L번 인형이 입력된 인형의 순서( = Input, 변화 전 인형 배치)와 비교했을 때, 얼마나 다른가(즉, "몇 개나 이동시켜야" 같은 종류의 인형이 연속으로 놓이도록 하는가, 또는 "몇 개의 인형을 옮겨야" 하는가)를 누적해주기 위함!!!
+		DFS(L + 1, idx, count);
+
+		count -= chk[List[L]][N] - (chk[List[L]][idx] - chk[List[L]][idx - chk[List[L]][N]]);
+		idx -= chk[List[L]][N];
+		Check[i] = 0;
+		List[L] = 0;
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", Min);
+}
+#endif
+
+
+
+
+// ★★★★★ 다시 풀 것!! ★★★★★ => 밑에!
+// 문제 B2: [TST]경로 찾기-SPJ => DFS	(잘못됨!!!)
+#if 0
+#include <stdio.h>
+#define NAX	(1010)
+#define KAX	(35)
+
+void Input(void);
+int Get_Distance(char *p, char *q);
+void DFS(int L, int s);
+void Print_List(int L);
+void Print(void);
+
+int N;	// 이진코드 수
+int K;	// 이진코드 길이
+char Code[NAX][KAX];
+int chk[NAX];
+int List[NAX];
+int s, e;
+int flag;
+
+int main(void)
+{
+	//int d;
+
+	freopen("in.txt", "r", stdin);
+	Input();
+
+	//d = Get_Distance( Code[s], Code[e] );
+	//if (d == 0)
+	//{
+	//	printf("%d\n", - 1);
+	//	return;
+	//}
+	List[1] = s;
+	chk[s] = 1;
+
+	DFS(2, s);
+	
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	flag = 0;
+	scanf("%d %d", &N, &K);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%s", Code[i]);
+	}
+	scanf("%d %d", &s, &e);
+}
+
+void DFS(int L, int s)
+{
+	int i;
+	//Print_List(L);
+	//printf("L = %d\n", L);
+
+
+	if (flag == 1) return;
+	if (flag == -1) return;
+
+	if (L > N)
+	{
+		if (List[L - 1] != e)
+		{
+			flag = -1;
+			return;
+		}
+	}
+	if ( List[L - 1] == e )
+	{
+		//if (List[L - 2] == s)
+		//{
+		//	flag = -1;
+		//	return;
+		//}
+		
+		flag = 1;
+		Print_List(L);
+		return;
+	}
+
+	for (i = 1; i <= N; i++)
+	{
+		if ( chk[i] ) continue;
+		if ( Get_Distance(Code[s], Code[i]) == 1 )
+		{
+			chk[i] = 1;
+			List[L] = i;
+
+			DFS(L + 1, i);
+
+			List[L] = 0;
+			chk[i] = 0;
+		}
+	}
+}
+
+int Get_Distance(char *p, char *q)
+{
+	int i, cnt = 0;
+
+	for (i = 0; i < K; i++)
+	{
+		if ( (*p - '0') ^ (*q - '0') ) cnt++;
+		p++; q++;
+	}
+
+	return cnt;
+}
+
+void Print_List(int L)
+{
+	int i;
+
+	printf("%d ", List[1]);
+	for (i = 2; i < L; i++)
+	{
+		printf("%d ", List[i]);
+	}
+	printf("\n");
+}
+
+void Print(void)
+{
+	if (flag == -1) printf("%d\n", flag);
+}
+#endif
+
+
+
+// 문제 B2: [TST]경로 찾기-SPJ => BFS	(★다시★)
+/*
+	조건
+	1) 이진코드들의 길이는 모두 동일( N개(3 ~ 1000), 길이 K(2 ~ 30) )
+	2) 해밍거리 : 두 코드의 좌 ~> 우 순으로 차례대로 비교할 때, 서로 다른 값을 가진 비트의 수
+	3) 해밍경로 : 모든 인접한 두 코드사이의 해밍 거리가 1인 경로
+	4) 
+*/
+#if 0
+#include <stdio.h>
+#define NAX	(1010)
+#define KAX	(35)
+
+void Input(void);
+int Get_Distance(char *p, char *q);
+int BFS(int ss);
+void Recursive_Print(int num);
+
+int N;	// 이진코드 수
+int K;	// 이진코드 길이
+char Code[NAX][KAX];
+int Visit[NAX];
+int Path[NAX];
+int Queue[NAX * 10];
+int s, e;
+int Wp, Rp;
+
+int main(void)
+{
+	int r;
+
+	freopen("in.txt", "r", stdin);
+	Input();
+	r = BFS(s);
+	//printf("r = %d\n", r);
+	if (r) Recursive_Print( e );
+	else printf("-1\n");
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	scanf("%d %d", &N, &K);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%s", Code[i]);
+	}
+	scanf("%d %d", &s, &e);
+}
+
+int Get_Distance(char *p, char *q)
+{
+	int i, cnt = 0;
+
+	for (i = 0; i < K; i++)
+	{
+		if ( (*p - '0') ^ (*q - '0') ) cnt++;
+		p++; q++;
+	}
+
+	return cnt;
+}
+
+//void In_Q(int yy, int xx)
+//{
+//	Queue[Wp].y = yy;
+//	Queue[Wp++].x = xx;
+//}
+//
+//NODE * Out_Q(void)
+//{
+//	return &(Queue[Rp++]);
+//}
+
+int BFS(int ss)
+{
+	int i;
+	int out;
+	int cnt = 0;
+
+	Queue[Wp++] = ss;
+	Visit[ss] = 1;
+	Path[ss] = 0;
+
+	while (Wp > Rp)
+	{
+		out = Queue[Rp++];
+		for (i = 1; i <= N; i++)
+		{
+			if ( Visit[i] ) continue;
+			if ( Get_Distance( Code[out], Code[i] ) == 1 )
+			{
+				//printf("Code[out] = %s, Code[i] = %s\n", Code[out], Code[i]);
+				Queue[Wp++] = i;
+				Visit[i] = 1;
+				Path[i] = out;
+				cnt++;
+				if (i == e && cnt > 1) return 1;
+				//break;
+			}
+		}
+	}
+
+	return 0;
+}
+
+void Recursive_Print(int num)
+{
+	if (Path[num] == 0)
+	{
+		printf("%d ", num);
+		return;
+	}
+
+	Recursive_Print(Path[num]);
+	printf("%d ", num);
+}
+#endif
+
+
+
+
+
+// 문제 B3: [TST]파이프 제거
+#if 0
+#include <stdio.h>
+#define DIR		 (4)
+#define NUMOPIPE (12)
+#define MAX		 (15)
+
+typedef struct _wt
+{
+	int y, x;
+}NODE;
+NODE Queue[MAX * MAX];
+
+void Input(void);
+void InQ(int yy, int xx);
+NODE * OutQ(void);
+void BFS(int sy, int sx);
+void Print(void);
+
+int N;
+int X, Y;
+char Map[MAX][MAX];
+int Visit[MAX][MAX];
+int remain;
+int Tool[DIR][NUMOPIPE][NUMOPIPE] = { { { 0, }, { 0, }, { 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1 }, { 0, }, { 0, }, { 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1 }, { 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1 }, { 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1 }, { 0, }, { 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1 }, { 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1 }, {0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1} },
+{ { 0, }, { 0, }, { 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1 }, { 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1 }, { 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1 }, { 0, }, { 0, }, { 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1 }, { 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1 }, { 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1 }, {0, }, {0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1} },
+{ { 0, }, { 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1 }, { 0, }, { 0, }, { 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1 }, { 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1 }, { 0, }, { 0, }, { 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1 }, { 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1 }, { 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1 }, { 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1 } },
+{ { 0, }, { 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1 }, { 0, }, { 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1 }, { 0, }, { 0, }, { 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1 }, { 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1 }, { 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1 }, { 0, }, { 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1 }, { 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1 } } };
+// 방향 / 시작 / 도착
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0, 0, -1, 1 };
+int Wp, Rp;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	//DFS(1, Y, X);
+	BFS(Y, X);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+
+	remain = 0;
+	scanf("%d", &N);
+	scanf("%d %d", &X, &Y);
+	for (i = 0; i < N; i++)
+	{
+		for (j = 0; j < N; j++)
+		{
+			scanf("%1x", &Map[i][j]);
+			if (Map[i][j] > 0) remain++;
+		}
+	}
+}
+
+void InQ(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp++].x = xx;
+}
+
+NODE * OutQ(void)
+{
+	return &(Queue[Rp++]);
+}
+
+void BFS(int sy, int sx)
+{
+	NODE * out = (NODE *)0x0;
+	int i;
+	int ny, nx;
+
+	Wp = Rp = 0;
+	InQ(sy, sx);
+	Visit[sy][sx] = 1;
+	remain--;
+
+	while (Wp > Rp)
+	{
+		out = OutQ();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (ny < 0 || ny >= N || nx < 0 || nx >= N) continue;
+			if (Tool[i][Map[sy][sx]][Map[ny][nx]] && Visit[ny][nx] == 0)
+			{
+				Visit[ny][nx] = 1;
+				InQ(ny, nx);
+				remain--;
+				//printf("ny = %d,nx = %d\n", ny, nx);
+			}
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", remain);
+}
+#endif
+
+// 비트 연산자 ver.
+#if 0
+#include <stdio.h>
+#define DIR		 (4)
+#define NUMOPIPE (12)
+#define MAX		 (15)
+
+typedef struct _wt
+{
+	int y, x;
+}NODE;
+NODE Queue[MAX * MAX];
+
+void Input(void);
+void InQ(int yy, int xx);
+NODE * OutQ(void);
+void BFS(int sy, int sx);
+void Print(void);
+
+int N;
+int X, Y;
+int Map[MAX][MAX];
+int Visit[MAX][MAX];
+int remain;
+
+int Faif[NUMOPIPE] = {0, 0xC, 3, 0xA, 6, 5, 9, 0xB, 0xE, 7, 0xD, 0xF};
+//			 상  하  좌  우
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0, 0, -1, 1 };
+int now[4] = { 1, 2, 4, 8 };
+int next[4] = { 2, 1, 8, 4 };
+int Wp, Rp;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	BFS(Y, X);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+	int tmp;
+
+	remain = 0;
+	scanf("%d", &N);
+	scanf("%d %d", &X, &Y);
+	for (i = 0; i < N; i++)
+	{
+		for (j = 0; j < N; j++)
+		{
+			scanf("%1x", &tmp);
+			Map[i][j] = Faif[tmp];
+			if (Map[i][j] > 0) remain++;
+		}
+	}
+}
+
+void InQ(int yy, int xx)
+{
+	Queue[Wp].y = yy;
+	Queue[Wp++].x = xx;
+}
+
+NODE * OutQ(void)
+{
+	return &(Queue[Rp++]);
+}
+
+void BFS(int sy, int sx)
+{
+	NODE * out = (NODE *)0x0;
+	int i;
+	int ny, nx;
+
+	Wp = Rp = 0;
+	InQ(sy, sx);
+	Visit[sy][sx] = 1;
+	remain--;
+
+	while (Wp > Rp)
+	{
+		out = OutQ();
+		sy = out->y;
+		sx = out->x;
+		for (i = 0; i < 4; i++)
+		{
+			ny = sy + dy[i];
+			nx = sx + dx[i];
+			if (ny < 0 || ny >= N || nx < 0 || nx >= N) continue;
+			if ( (Map[sy][sx] & now[i]) == 0 ) continue;
+			if ( (Visit[ny][nx] == 0) && (Map[ny][nx] & next[i]) )
+			{
+				Visit[ny][nx] = 1;
+				InQ(ny, nx);
+				remain--;
+				//printf("ny = %d,nx = %d\n", ny, nx);
+			}
+		}
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", remain);
+}
+#endif
+
+
+
+
+
+// 문제 B4: [TEST] 과수원
+#if 0
+#include <stdio.h>
+#define MAX	(300)
+
+void Input(void);
+void Operation(void);
+void Print(void);
+
+int N;
+int Map[MAX][MAX];
+int apple;
+int result_cnt;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	if (apple & 3) printf("-1\n");
+	else
+	{
+		Operation();
+		Print();
+	}
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+	apple = 0;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			scanf("%1d", &Map[i][j]);
+			if (Map[i][j] == 1) apple++;
+		}
+	}
+}
+
+void Operation(void)
+{
+	int i = 0, j, y, x;
+	int cnt1, cnt2, cnt3, cnt4;
+	result_cnt = 0;
+
+
+	for (i = 1; i < N; i++)
+	{
+		for (j = 1; j < N; j++)
+		{
+			cnt1 = cnt2 = cnt3 = 0;
+			for (y = 1; y <= i; y++)
+			{
+				for (x = 1; x <= j; x++)
+				{
+					if (Map[y][x] & 1) cnt1++;
+				}
+			}
+			if( (cnt1 << 2) != apple ) continue;
+
+			for (y = i + 1; y <= N; y++)
+			{
+				for (x = j + 1; x <= N; x++)
+				{
+					if (Map[y][x] & 1) cnt2++;
+				}
+
+				if (cnt1 != cnt2) continue;
+
+				for (x = 1; x <= j; x++)
+				{
+					if (Map[y][x] & 1) cnt3++;
+				}
+
+				if (cnt2 != cnt3) continue;
+			}
+
+			cnt4 = apple - cnt1 - cnt2 - cnt3;
+			if ( (cnt1 == cnt2) && (cnt2 == cnt3) && (cnt3 == cnt4) ) result_cnt++;
+		}
+		//printf("cnt1 = %d, cnt2 = %d, cnt3 = %d, cnt4 = %d\n", cnt1, cnt2, cnt3, cnt4);	
+	}
+}
+
+void Print(void)
+{
+	//int i, j;
+	//for (i = 1; i <= N; i++)
+	//{
+	//	for (j = 1; j <= N; j++)
+	//	{
+	//		printf("%2d", Map[i][j]);
+	//	}
+	//	printf("\n");
+	//}
+
+	if (result_cnt == 0) result_cnt = -1;
+	printf("%d\n", result_cnt);
+}
+#endif
+
+
+// ★인형 정리 문제처럼 배열Tool 만들어서!★
+#if 0
+#include <stdio.h>
+#define MAX	(300)
+
+void Input(void);
+void Make_Tool(int y, int x);
+void Operation(void);
+void Print(void);
+
+int N;
+int Map[MAX][MAX];
+int Tool[MAX][MAX];
+int apple;
+int result_cnt;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	Operation();
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i, j;
+	apple = 0;
+
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		for (j = 1; j <= N; j++)
+		{
+			scanf("%1d", &Map[i][j]);
+			if (Map[i][j] == 1)
+			{
+				apple++;
+				Make_Tool(i, j);
+			}
+		}
+	}
+}
+
+void Make_Tool(int y, int x)
+{
+	int i, j;
+
+	for (i = y; i <= N; i++)
+	{
+		for (j = x; j <= N; j++)
+		{
+			Tool[i][j]++;
+		}
+	}
+}
+
+void Operation(void)
+{
+	int i, j;
+	int cnt1, cnt2, cnt3, cnt4;
+	cnt1 = cnt2 = cnt3 = cnt4 = 0;
+	result_cnt = 0;
+
+	for (i = 1; i < N; i++)
+	{
+		for (j = 1; j < N; j++)
+		{
+			cnt1 = Tool[i][j];
+			cnt2 = Tool[i][N] - cnt1;
+			cnt3 = Tool[N][j] - cnt1;
+			cnt4 = apple - cnt1 - cnt2 - cnt3;
+			if ((cnt1 == cnt2) && (cnt2 == cnt3) && (cnt3 == cnt4)) result_cnt++;
+			cnt1 = cnt2 = cnt3 = 0;
+		}
+	}
+}
+
+void Print(void)
+{
+	//int i, j;
+	//for (i = 1; i <= N; i++)
+	//{
+	//	for (j = 1; j <= N; j++)
+	//	{
+	//		printf("%4d", Tool[i][j]);
+	//	}
+	//	printf("\n");
+	//}
+	if (result_cnt == 0) result_cnt = -1;
+	printf("%d\n", result_cnt);
+}
+#endif
+
+
+
+
+
+// 문제 B5: [TEST] 수식연산
+/*
+	조건
+	1) 주어진 데이터는 순서대로!
+	2) =는 한 번만 사용
+	3) 나머지 연산자는 횟수 제한 없음!
+	4) 연산자의 우선순위 없이 앞에서부터 진행
+*/
+// 백트래킹이 중요!!!!
+#if 0
+#include <stdio.h>
+#define MAX	(10 + 5)
+
+void Input(void);
+void DFS(int L, int result);
+void Print(void);
+void Init(void);
+
+int T;
+int N;
+int Num[MAX];
+int equal;
+int result1;
+int cnt;
+int lcnt;
+int List[MAX];
+int flag;
+
+int main(void)
+{
+	int i, j;
+
+	freopen("in.txt", "r", stdin);
+
+	scanf("%d", &T);
+	for (i = 1; i <= T; i++)
+	{
+		Input();	
+		for (j = 1; j < N; j++)
+		{
+			equal = j;
+			DFS(1, Num[1]);
+		}
+		Print();
+		Init();
+	}
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	flag = 0;
+	cnt = 0;
+	equal = 0;
+	result1 = 0;
+	scanf("%d", &N);
+	for (i = 1; i <= N; i++)
+	{
+		scanf("%d", &Num[i]);
+	}
+}
+
+void DFS(int L, int result)
+{
+	
+
+	if (L == N)
+	{
+		if (result == result1) cnt++;
+		//printf("result = %d, result1 = %d --> %d\n", result, result1, cnt);
+		return;
+	}
+	if (L == equal)
+	{
+		result1 = result;
+		DFS(L + 1, Num[L + 1]);
+		return;
+	}
+
+	List[L] = result;
+	DFS(L + 1, result + Num[L + 1]);
+	List[L] = 0;
+
+	List[L] = result;
+	DFS(L + 1, result * Num[L + 1]);
+	List[L] = 0;
+
+	List[L] = result;
+	DFS(L + 1, result % Num[L + 1]);
+	List[L] = 0;
+}
+
+void Print(void)
+{
+	printf("%d\n", cnt);
+}
+
+void Init(void)
+{
+	int i;
+
+	for (i = 1; i <= N; i++)
+	{
+		Num[i] = 0;
+	}
+}
+#endif
+
+
+
+
+
+
+// 문제 B6: [TST]현진이의 농장
+#if 0
+#include <stdio.h>
+#define rock	(23)
+
+typedef struct
+{
+	int y, x;
+}NODE;
+NODE List[25];
+
+void Input(void);
+void DFS(int L, int sy, int sx);
+void Print(void);
+
+int K;
+int Farm[7][7];
+int dy[4] = { -1, 1, 0, 0 };
+int dx[4] = { 0, 0, -1, 1 };
+int Depth;
+int cnt;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	Farm[1][1] = 1;
+	DFS(1, 1, 1);
+	Print();
+
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+	int y, x;
+
+	cnt = 0;
+	scanf("%d", &K);
+	for (i = 1; i <= K; i++)
+	{
+		scanf("%d %d", &y, &x);
+		Farm[y][x] = 1;
+	}
+	Depth = 25 - K;
+}
+
+void DFS(int L, int sy, int sx)
+{
+	int i;// , r, c;
+	int ny, nx;
+	//for (r = 1; r <= 5; r++)
+	//{
+	//	for (c = 1; c <= 5; c++)
+	//	{
+	//		printf("%d ", Farm[r][c]);
+	//	}
+	//	printf("\n");
+	//}
+	//printf("\n");
+
+	//printf("L = %d, sy = %d, sx = %d\n", L, sy, sx);
+
+	if (L >= Depth)
+	{
+		if(sy == 5 && sx == 5) cnt++;
+		return;
+	}
+	
+	for (i = 0; i < 4; i++)
+	{
+		ny = sy + dy[i];
+		nx = sx + dx[i];
+
+		if ( ny < 1 || ny > 5 || nx < 1 || nx > 5 || Farm[ny][nx] != 0 ) continue;
+		List[L].y = ny;
+		List[L].x = nx;
+		Farm[ny][nx] = 1;
+
+		DFS(L + 1, ny, nx);
+
+		Farm[ny][nx] = 0;
+		List[L].y = 0;
+		List[L].x = 0;
+	}
+}
+
+void Print(void)
+{
+	//int i, j;
+
+	/*for (i = 1; i <= 5; i++)
+	{
+		for (j = 1; j <= 5; j++)
+		{
+			printf("%d ", Farm[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");*/
+	printf("%d\n", cnt);
+}
+#endif
+
+
+
+
+
+// 문제 B7: [TST] 벽장문의 이동	=> DFS는 이렇게 사용하는 것이다
+#if 0
+#include <stdio.h>
+#define ABS(x)	( ((x) < 0) ? -(x) : (x) )
+#define MAX	(21)
+
+void Input(void);
+void DFS(int L, int count);
+void Print(void);
+
+int N;				// 벽장 개수(3 ~ 20)
+int open1, open2;
+int u;
+int use[MAX];		// 열어야할 문 번호
+int door[MAX];		// 열렸는지(1) 닫혔는지(0)
+int Min;
+
+int main(void)
+{
+	freopen("in.txt", "r", stdin);
+	Input();
+	DFS(1, 0);
+	Print();
+	
+	return 0;
+}
+
+void Input(void)
+{
+	int i;
+
+	Min = 9999;
+	scanf("%d", &N);
+	scanf("%d %d", &open1, &open2);
+	door[open1] = door[open2] = 1;
+	scanf("%d", &u);
+	for (i = 1; i <= u; i++)
+	{
+		scanf("%d", &use[i]);
+	}
+}
+
+// DFS에서는 return을 통한 백트래킹과 가지치기가 중요!! (너무 인자에 매몰되지 말 것!!)
+void DFS(int L, int count)
+{
+	int i;
+
+	if (count >= Min) return;
+	if (L > u)
+	{
+		if (Min > count) Min = count;
+		return;
+	}
+
+	if ( door[ use[L] ] == 1 )
+	{
+		DFS(L + 1, count);
+	}
+	else
+	{
+		for (i = 1; i <= N; i++)
+		{
+			if ( door[i] == 1 )
+			{
+				door[i] = 0; door[use[L]] = 1;
+				DFS(L + 1, count + ABS(use[L] - i));
+				door[i] = 1; door[use[L]] = 0;
+			}
+		}
+		//printf("L = %d, use[L] = %d, count = %d\n", L + 1, use[L], count + d);
+	}
+}
+
+void Print(void)
+{
+	printf("%d\n", Min);
+}
+#endif
